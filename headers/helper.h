@@ -10,31 +10,40 @@ typedef enum BOOL{
     TRUE = 1
 } BOOL;
 
-/* 
-Function that recieves the file name and adds the as suffix
-*/
+
 /**
  * @brief Extracts the filename from a given file path.
  * 
- * @param file_path - the path to the file.
+ * @param file_name - the name of the file without suffix
  * @return char* - the extracted filename.
  */
+char* get_file_name(char* file_name);
+
 /**
- * @brief Extracts the filename from a given file path
+ * @brief Looks for a file with the given name.
  * 
- * @param file_path A string containing the full path to a file
- * @return char* The extracted filename (caller is responsible for memory)
+ * @param file_name_suffix - the name of the file.with a suffix
+ * @return FILE - the file if found, NULL otherwise.
  */
-char* get_file_name(char* file_path);
-
-/* Opens the file name with read, if it opens returns the file else NULL*/
-FILE look_for_file(char* file_name);
+FILE* look_for_file(char* file_name_suffix);
 
 
-/* 
-Function that adds a suffix to a file name
-*/
+/**
+ * @brief Adds a suffix to a file name.
+ * 
+ * @param file_name - the name of the file.
+ * @param suffix - the suffix to add.
+ * @return char* - the new file name.
+ */
 char* add_suffix(char* file_name, char* suffix);
 
+/**
+ * @brief Changes the suffix of a file name.
+ * 
+ * @param file_name - the name of the file.
+ * @param suffix - the new suffix.
+ * @return char* - the new file name.
+ */
 char* change_suffix(char* file_name, char* suffix);
+
 #endif /* HELPER_H */

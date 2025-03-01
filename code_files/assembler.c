@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 {
     int i = 1;
     char *file_name;
-    FILE *file;
+    FILE* file;
     /* check if the number of arguments is correct */
     if (argc < TWO)
     {
@@ -29,19 +29,14 @@ int main(int argc, char *argv[])
         /* get the file name with a suffix if the arg is empty continue*/
         file_name = get_file_name(argv[i]);
         if (file_name == NULL)
-        {
             continue;
-        }
+        
 
         file = look_for_file(file_name);
         if (file == NULL)
-        {
             continue;
-        }
 
         if (preprocess(file_name) == 0)
-        {
             continue;
-        }
     }
 }
