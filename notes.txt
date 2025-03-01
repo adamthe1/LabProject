@@ -2,3 +2,5 @@
 each register 24 bits, least significant bit is index 0
 the memory has 2^21 cells with addresses from 0 - (2^21 - 1)
 2s complement, ascii characters 
+
+add things to example
