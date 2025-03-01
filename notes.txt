@@ -1,0 +1,4 @@
+8 registers : r0, r1, r2, r3, r4, r5, r6, r7
+each register 24 bits, least significant bit is index 0
+the memory has 2^21 cells with addresses from 0 - (2^21 - 1)
+2s complement, ascii characters 
