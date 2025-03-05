@@ -42,3 +42,10 @@ char* change_suffix(char* file_name, char* suffix){
     strcpy(dot, suffix);
     return new_file_name;
 }
+
+char* skip_whitespace(char* str) {
+    while (*str && isspace((unsigned char)*str)) {
+        str++;
+    }
+    return str;
+}

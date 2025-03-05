@@ -6,5 +6,14 @@
 #ifndef _PRE_ASSEMBLE_H
 #define _PRE_ASSEMBLE_H
 
+
+/**
+ * main function of the file, opens the file and calls the macros functions.
+ */
 int preprocess(char* file_name);
+
+int save_macros(char* file_name);
+
+
+#endif 
 

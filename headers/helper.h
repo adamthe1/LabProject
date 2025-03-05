@@ -46,4 +46,12 @@ char* add_suffix(char* file_name, char* suffix);
  */
 char* change_suffix(char* file_name, char* suffix);
 
+/**
+ * @brief Skips whitespace characters in a string.
+ * 
+ * @param str - the string to skip whitespace in.
+ * @return char* - the pointer to the first non-whitespace character.
+ */
+char* skip_whitespace(char* str);
+
 #endif /* HELPER_H */
