@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 typedef enum BOOL{
     FALSE = 0,
@@ -45,5 +46,31 @@ char* add_suffix(char* file_name, char* suffix);
  * @return char* - the new file name.
  */
 char* change_suffix(char* file_name, char* suffix);
+
+
+/**
+ * @brief This function chaecks if the macro name is a name of a known word of assembly (operation/instruction/register).
+ * 
+ * @param name - the name of the macro.
+ * @return int - returns 1 if the macro name is valid and 0 if it isn't.
+ */
+int cmp_mcro_name(char* name);
+
+/**
+ * @brief This function checks if the mcro name starts with a letter and contains alphanumeric characters or _
+    and that it is no longer than 31 chars.
+ * 
+ * @param name - the name of the macro.
+ * @return int - returns 1 if the macro name is valid and 0 if it isn't.
+ */
+int mcro_letters(char* name);
+
+/**
+ * @brief This function removes extra white chars from s.
+ * 
+ * @param s - the string to remove extra white chars from.
+ * @return void.
+ */
+void extra_spaces(char* s);
 
 #endif /* HELPER_H */
