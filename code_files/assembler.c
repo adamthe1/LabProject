@@ -5,6 +5,8 @@
 #include "../headers/errors.h"
 #include "../headers/helper.h"
 #include "../headers/define.h"
+#include "../headers/pre_assemble.h"
+
 /**
  * @brief The main function of the assembler program.
  * 
@@ -20,7 +22,7 @@ int main(int argc, char *argv[])
     /* check if the number of arguments is correct */
     if (argc < TWO)
     {
-        print_error(Error_0);
+        report_error(0, Error_0);
         return 1;
     }
     /* preprocess the files */
@@ -36,7 +38,10 @@ int main(int argc, char *argv[])
         if (file == NULL)
             continue;
 
+        printf("Starting preprocessing\n");
         if (preprocess(file_name) == 0)
             continue;
+
+        printf("Preprocessing finished\n");
     }
 }
