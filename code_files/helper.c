@@ -44,6 +44,7 @@ char* change_suffix(char* file_name, char* suffix){
     return new_file_name;
 }
 
+
 /**
  * @brief This function chaecks if the macro name is a name of a known word of assembly (operation/instruction/register).
  * 
@@ -146,3 +147,10 @@ void extra_spaces(char* s){
     strcpy(s,temp_s);
 }
 
+
+char* skip_whitespace(char* str) {
+    while (*str && isspace((unsigned char)*str)) {
+        str++;
+    }
+    return str;
+}

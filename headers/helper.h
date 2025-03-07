@@ -47,7 +47,6 @@ char* add_suffix(char* file_name, char* suffix);
  */
 char* change_suffix(char* file_name, char* suffix);
 
-
 /**
  * @brief This function chaecks if the macro name is a name of a known word of assembly (operation/instruction/register).
  * 
@@ -72,5 +71,14 @@ int mcro_letters(char* name);
  * @return void.
  */
 void extra_spaces(char* s);
+
+/**
+ * @brief Skips whitespace characters in a string.
+ * 
+ * @param str - the string to skip whitespace in.
+ * @return char* - the pointer to the first non-whitespace character.
+ */
+char* skip_whitespace(char* str);
+
 
 #endif /* HELPER_H */
