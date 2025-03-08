@@ -18,6 +18,8 @@ typedef struct Error{
     char* error_message;
 } Error;
 
-void print_error(int error_num);
+extern Error error_list[];
+
+void report_error(int line_num, int error_num);
 
 #endif /* ERRORS_H */

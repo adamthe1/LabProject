@@ -5,6 +5,7 @@
 #include "../headers/pre_assemble.h"
 #include "../headers/helper.h"
 #include "../headers/define.h"
+#include "../headers/errors.h"
 
 /*
 algorithem:
@@ -35,15 +36,12 @@ int preprocess(char* file_name){
     int mcro_flag = 0, linecount = 0;
     fp = fopen(file_name, "r+");
     fp2 = fopen(strcat(strtok(file_name,"."),".am"), "w");
-    if (fp == NULL) {
-        /*error - opening file failed*/
+    if (fp == NULL || fp2 == NULL) {
+        report_error(linecount,Error_1);
         return 0;
     }
     while(fp != NULL){
-        if (!fgets(str,MAX_LINE_LENGTH, fp) || str == NULL){
-            /*ERROR*/
-            break;
-        }
+        fgets(str,MAX_LINE_LENGTH, fp);
         linecount++;
         strcpy(temp,str);
         extra_spaces(temp);
@@ -58,12 +56,12 @@ int preprocess(char* file_name){
         if(strcmp(temp,"mcro")){
             temp = strtok(NULL, " ");
             if(!temp){
-                /*error*/
+                report_error(linecount,Error_2);
                 return 0;
             }
             /*checks that there are no extra chars in the line of the macro declaration*/
             if(strtok(NULL, " ") || !valid_macro_dec(temp)){
-                /*error*/
+                report_error(linecount,Error_2);
                 return 0;
             }
             mcro_flag = 1;
@@ -75,7 +73,7 @@ int preprocess(char* file_name){
             if(strcmp(strtok(temp, " "),"mcroend")){
                 /*checks that there are no extra chars in the line of the macroend declaration*/
                 if(strtok(NULL, " ")){
-                    /*error*/
+                    report_error(linecount,Error_3);
                     return 0;
                 }
                 add_code_to_macro(temp_code);
