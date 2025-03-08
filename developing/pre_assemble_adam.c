@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,7 +6,6 @@
 #include "../headers/pre_assemble.h"
 #include "../headers/helper.h"
 #include "../headers/define.h"
-#include "../headers/errors.h"
 
 /*
 algorithem:
@@ -31,17 +31,48 @@ otherwise, return to 6.
  * @return int - returns 1 if the pre_assembler has finished successfuly and 0 if it hasn't.
  */
 int preprocess(char* file_name){
+    
     FILE *fp, *fp2;
     char* str, *temp, *temp_code="", *code;
     int mcro_flag = 0, linecount = 0;
     fp = fopen(file_name, "r+");
     fp2 = fopen(strcat(strtok(file_name,"."),".am"), "w");
-    if (fp == NULL || fp2 == NULL) {
-        report_error(linecount,Error_1);
+    if (fp == NULL) {
+        /*error - opening file failed*/
         return 0;
     }
+    
+    
     while(fp != NULL){
-        fgets(str,MAX_LINE_LENGTH, fp);
+        str = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
+        if (!str) {
+            printf("Error: Memory allocation failed\n");
+            return 0;
+        }
+        
+        if (!fgets(str, MAX_LINE_LENGTH, fp)) {
+            free(str);
+            break;
+        }
+        
+        temp = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
+        if (!temp) {
+            printf("Error: Memory allocation failed\n");
+            free(str);
+            return 0;
+        }
+        
+        if (temp_code == NULL || strlen(temp_code) == 0) {
+            temp_code = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
+            if (!temp_code) {
+            printf("Error: Memory allocation failed\n");
+            free(str);
+            free(temp);
+            return 0;
+            }
+            temp_code[0] = '\0';  /* Initialize as empty string */
+        }
+        
         linecount++;
         strcpy(temp,str);
         extra_spaces(temp);
@@ -52,28 +83,36 @@ int preprocess(char* file_name){
             fprintf(fp2,code);
             continue;
         }
+        
+        
         /*step3*/
         if(strcmp(temp,"mcro")){
             temp = strtok(NULL, " ");
             if(!temp){
-                report_error(linecount,Error_2);
+                /*error*/ printf("error1");
                 return 0;
             }
             /*checks that there are no extra chars in the line of the macro declaration*/
-            if(strtok(NULL, " ") || !valid_macro_dec(temp)){
-                report_error(linecount,Error_2);
+            if(temp[strlen(temp)-1] == '\n')
+                temp[strlen(temp)-1] = '\0';
+            if( !valid_macro_dec(temp)){
+                /*error*/ printf("error2");
                 return 0;
             }
             mcro_flag = 1;
+            /* remove /n from the end of temp if its there */
+            
             create_macro(temp, linecount);
             continue;
         }
+        
+        
         if (mcro_flag==1)
         {
             if(strcmp(strtok(temp, " "),"mcroend")){
                 /*checks that there are no extra chars in the line of the macroend declaration*/
                 if(strtok(NULL, " ")){
-                    report_error(linecount,Error_3);
+                    /*error*/ printf("error3");
                     return 0;
                 }
                 add_code_to_macro(temp_code);
@@ -97,17 +136,20 @@ int valid_macro_dec(char *mcro_name)
 {
     /*checks that the mcro name is not null*/
     char* temp;
-    /*first call to strtok is in the funtion that calls this function*/
-    temp = strtok(NULL, " \n");
+    
+    /* No need to use strtok here, mcro_name is already the token we want to check */
+    
+    temp = mcro_name;
     if(!temp)
     {
-        /*error*/
+        /*error*/ printf("error4");
         return 0;
     }
 
     /*checks that the mcro name is not a name of operation/instruction/register*/
     if(!cmp_mcro_name(temp)){
         /*error - invalid mcro name*/
+         /*error*/ printf("error5");
         return 0;
     }
 
@@ -115,8 +157,11 @@ int valid_macro_dec(char *mcro_name)
     and that its legnth is not greater than 31*/
     if(!mcro_letters(temp)){
        /*error - invalid mcro name*/
+        /*error*/ printf("error6");
        return 0; 
     }
         
     return 1;
 }
+
+

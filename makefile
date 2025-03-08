@@ -2,7 +2,7 @@
 
 # Compiler settings
 CC = gcc
-CFLAGS = -Wall -g
+CFLAGS = -Wall -ansi -pedantic
 
 # Source and header directories
 SRC_DIR = code_files
@@ -18,9 +18,5 @@ assembler: $(SRCS)
 # Clean up
 clean:
 	rm -f assembler
-
-# Run the assembler with a test file
-run: assembler
-	./assembler test_file.as
 
 .PHONY: clean run

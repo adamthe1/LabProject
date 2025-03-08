@@ -4,6 +4,21 @@
 #include "../headers/helper.h"
 #include "../headers/define.h"
 
+char* reg[8] = {"r0","r1","r2","r3","r4","r5","r6","r7"};
+
+typedef struct op_code{
+    char* name;
+    int input_num;
+}op_code;
+
+op_code op_codes[16] = {
+    {"mov",2},{"cmp",2},{"add",2},{"sub",2},{"lea,2"},
+    {"clr",1},{"not",1},{"inc",1},{"dec",1},{"jmp",1},{"bne",1},{"jsr",1},{"red",1},{"prn,1"},
+    {"rts",0},{"stop",0}
+};
+
+char* insturctions[4] = {"data","string","entry","extern"};
+
 char* get_file_name(char* file_name){
     char* name = (char*)malloc(strlen(file_name) + 1);
     if(name == NULL){
@@ -43,6 +58,7 @@ char* change_suffix(char* file_name, char* suffix){
     strcpy(dot, suffix);
     return new_file_name;
 }
+
 
 /**
  * @brief This function chaecks if the macro name is a name of a known word of assembly (operation/instruction/register).
@@ -90,6 +106,7 @@ int mcro_letters(char* name){
     int i = 0;
     if(!isalpha(name[i])){
         /*error*/
+        printf("error7");
         return 0;
     }
     i++;
@@ -97,11 +114,13 @@ int mcro_letters(char* name){
     {
         if(i == MAX_MCRO_LENGTH){
             /*error*/
+            printf("error8");
             return 0;
         }
 
         if(name[i] != '_' && !isalnum(name[i])){
             /*error*/
+            printf("error9 %s, %c",name, name[i]);
             return 0;
         }
         i++;
@@ -116,7 +135,10 @@ int mcro_letters(char* name){
  * @return void.
  */
 void extra_spaces(char* s){
-    char* temp_s;
+    char* temp_s = (char*)malloc(strlen(s) + 1);
+    if(temp_s == NULL){
+        return;
+    }
     int i=0,j=0, space=1;
     while(s[i] != '\0'){
         if(s[i] == ' ' || s[i] == '\t'){
@@ -146,3 +168,10 @@ void extra_spaces(char* s){
     strcpy(s,temp_s);
 }
 
+
+char* skip_whitespace(char* str) {
+    while (*str && isspace((unsigned char)*str)) {
+        str++;
+    }
+    return str;
+}

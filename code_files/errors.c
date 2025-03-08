@@ -9,6 +9,7 @@ Error error_list[] = {
     {Error_3, "Error 3: Unvalid macroend declaration\n"},
 
 
+
     {Error_8, "Error 8: Label name is too long\n"},
     {Error_9, "Error 9: Invalid label name\n"},
     {Error_10, "Error 10: Missing .data directive\n"},
