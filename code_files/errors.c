@@ -7,6 +7,9 @@ Error error_list[] = {
     {Error_1, "Error 1: Can't open file\n"},
     {Error_2, "Error 2: Unvalid macro declaration\n"},
     {Error_3, "Error 3: Unvalid macroend declaration\n"},
+    {Error_4, "Error 4: Error: Memory allocation failed\n"},
+    {Error_5, "Error 5: Reading text failed\n"},
+
 
 
 

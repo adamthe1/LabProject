@@ -10,7 +10,7 @@ typedef enum ERROR_NUMBERS {
     Error_7, Error_8, Error_9,
     Error_10, Error_11, Error_12,
     Error_13, Error_14, Error_15,
-    Error_16, Error_17, Error_18,
+    Error_16, Error_17, Error_18
 } ERROR_NUMBERS;
 
 typedef struct Error{

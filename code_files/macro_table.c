@@ -37,10 +37,10 @@ int create_macro(char* name, int line_index){
  * @return int - 1 if the code was added successfully, 0 otherwise.
  */
 int add_code_to_macro(char* code){
+    Macro* current = head;
     if(head == NULL){
         return 0;
     }
-    Macro* current = head;
     while(current->next != NULL){
         current = current->next;
     }

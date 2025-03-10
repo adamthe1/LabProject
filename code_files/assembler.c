@@ -44,4 +44,5 @@ int main(int argc, char *argv[])
 
         printf("Preprocessing finished\n");
     }
+    return 0;
 }

@@ -114,7 +114,7 @@ int mcro_letters(char* name){
     {
         if(i == MAX_MCRO_LENGTH){
             /*error*/
-            printf("error8");
+            printf("error8\n");
             return 0;
         }
 
@@ -136,10 +136,10 @@ int mcro_letters(char* name){
  */
 void extra_spaces(char* s){
     char* temp_s = (char*)malloc(strlen(s) + 1);
+    int i=0,j=0, space=1;
     if(temp_s == NULL){
         return;
     }
-    int i=0,j=0, space=1;
     while(s[i] != '\0'){
         if(s[i] == ' ' || s[i] == '\t'){
             if(s[i] == '\t'){
