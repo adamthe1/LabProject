@@ -38,10 +38,12 @@ int main(int argc, char *argv[])
         if (file == NULL)
             continue;
 
+        /*
         printf("Starting preprocessing\n");
         if (preprocess(file_name) == 0)
             continue;
 
         printf("Preprocessing finished\n");
+        */
     }
 }

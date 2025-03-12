@@ -95,7 +95,7 @@ int preprocess(char* file_name){
             /*checks that there are no extra chars in the line of the macro declaration*/
             if(temp[strlen(temp)-1] == '\n')
                 temp[strlen(temp)-1] = '\0';
-            if( !valid_macro_dec(temp)){
+            if(strtok(NULL, " ") || !valid_macro_dec(temp)){
                 /*error*/ printf("error2");
                 return 0;
             }

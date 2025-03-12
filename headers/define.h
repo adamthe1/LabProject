@@ -8,13 +8,16 @@
 #define STRING_CHAR '"'
 #define TWO 2
 #define MAX_MCRO_LENGTH 31
-
+#define NUM_OPCODES 16
+#define BITS_IN_DATA 24
+#define UNKNOWN_BINARY 16777216 /* Value equal to 2^24 (16,777,216) */
 
 
 
 
 #define CODE_TYPE 'c'
 #define DATA_TYPE 'd'
+#define EXTERN_TYPE 'e'
 
 /* Memory size limits */
 #define MEMORY_SIZE 4096
@@ -24,13 +27,22 @@
 #define MAX_LABEL_LEN 31
 #define MAX_OPERATION_LEN 5
 #define MAX_OPERANDS 2
-#define MAX_OPERAND_LEN 50
+#define MAX_OPERAND_LEN 80
 
 /* Addressing modes */
 #define ADDR_MODE_IMMEDIATE 0
 #define ADDR_MODE_DIRECT 1
 #define ADDR_MODE_RELATIVE 2
 #define ADDR_MODE_REGISTER 3
+#define UKNOWN_LABEL_RELATIVE 16777217
+#define UKNOWN_LABEL_DIRECT 16777218
+
+/* Addressing mode bits */
+#define ADDR_NONE_BIT  0  
+#define ADDR_IMMEDIATE_BIT  (1 << 0)  
+#define ADDR_DIRECT_BIT    (1 << 1) 
+#define ADDR_RELATIVE_BIT   (1 << 2)
+#define ADDR_REGISTER_BIT   (1 << 3)
 
 /* Error codes for first pass */
 #define ERR_NONE 0

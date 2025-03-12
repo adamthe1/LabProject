@@ -1,0 +1,7 @@
+; Test assembly code
+.extern EXTERNAL
+DATA_LABEL: .data 100, 200, 300
+STRING_LABEL: .string "Hello"
+
+; Comment line test
+CODE_LABEL: mov r1, r2

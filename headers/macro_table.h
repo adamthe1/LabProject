@@ -54,4 +54,4 @@ Macro* get_macro(char* name);
 
 void free_macros();
 
-#endif // _MCRO_TABLE_H
+#endif

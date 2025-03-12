@@ -6,11 +6,42 @@
 #include <string.h>
 #include <ctype.h>
 
+
+
+
+typedef struct Op_code{
+    char* name;
+    int opcode_number;
+    int funct;
+    int operand_count;
+    int addressing_type_src;
+    int addressing_type_end;
+}Op_code;
+
+extern Op_code op_codes[16];
+
+extern char* instructions[4];
+
 typedef enum BOOL{
     FALSE = 0,
     TRUE = 1
 } BOOL;
 
+/**
+ * @brief Gets the opcode structure for a given opcode name.
+ * 
+ * @param name - the name of the opcode.
+ * @return Op_code* - pointer to the opcode structure if found, NULL otherwise.
+ */
+Op_code* get_opcode(char* name);
+
+/**
+ * @brief Gets the register number from a register name.
+ * 
+ * @param reg_name - the name of the register (e.g., "$3", "$t0").
+ * @return int - the register number if valid, -1 otherwise.
+ */
+int get_reg(char* reg_name);
 
 /**
  * @brief Extracts the filename from a given file path.
@@ -79,6 +110,30 @@ void extra_spaces(char* s);
  * @return char* - the pointer to the first non-whitespace character.
  */
 char* skip_whitespace(char* str);
+
+/**
+ * @brief This function converts a number to binary with 2s complement.
+ * @brief The number of bits is given in DEFINE.h.
+ * @param binary - the array to store the binary number.
+ * @return int - returns 1 if the conversion was successful and 0 if it wasn't.
+ */
+int dec_to_binary(int num, int* binary);
+
+/**
+ * @brief This function copys the string and returns a pointer to the new string.
+ * 
+ * @param s - the string to copy.
+ * 
+ */
+
+ char* copy_string(char* s);
+
+/**
+ * @brief  function to trim whitespace from end of string 
+ * 
+ * @param s - the string to trim.
+ */
+ void trim_whitespace(char* s);
 
 
 #endif /* HELPER_H */

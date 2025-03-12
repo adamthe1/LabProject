@@ -2,26 +2,7 @@
 #define _FIRST_PASS_H
 
 #include <stdio.h>
-#include "label_table.h"
-
-/* Error codes for first pass */
-#define ERR_NONE 0
-#define ERR_SYNTAX 1
-#define ERR_LABEL 2
-#define ERR_DIRECTIVE 3
-#define ERR_OPERAND 4
-#define ERR_FILE 5
-
-/* Maximum values */
-#define MAX_LABEL_LEN 31
-#define MAX_LINE_LENGTH 80
-
-/* Instruction types */
-#define INST_TYPE_OPERATION 1
-#define INST_TYPE_DATA 2
-#define INST_TYPE_STRING 3
-#define INST_TYPE_ENTRY 4
-#define INST_TYPE_EXTERN 5
+#include "label_data_struct.h"
 
 /**
  * @brief Performs the first pass on the assembly file
@@ -92,20 +73,25 @@ int process_extern_directive(char* line);
 int process_operation(char* line, int* IC);
 
 /**
- * @brief Skips whitespace in a string
+ * @brief Encodes an operand into binary form
  * 
- * @param str - The string to process
- * @return char* - Pointer to first non-whitespace character
+ * @param operand - The operand to encode
+ * @param addr_mode - The addressing mode of the operand
+ * @param IC - Current instruction counter (updated by function)
+ * @return int - 1 if successful, 0 if error
  */
-char* skip_whitespace(char* str);
+int encode_operand(char* operand, int addr_mode, int* IC);
 
 /**
- * @brief Reports an error found during the first pass
+ * @brief Determines the addressing mode and register number of an operand
  * 
- * @param line_num - Current line number
- * @param err_type - Error type code
- * @param message - Error message
+ * @param operand - The operand to analyze
+ * @param addr_mode - Buffer to store the addressing mode
+ * @param reg_num - Buffer to store the register number
+ * @return int - 1 if successful, 0 if error
  */
-void report_error(int line_num, int err_type, char* message);
+
+int determine_addressing_mode(char* operand, int* addr_mode, int* reg_num);
+
 
 #endif /* _FIRST_PASS_H */
