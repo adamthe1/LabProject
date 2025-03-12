@@ -1,22 +1,22 @@
-macr macroAlpha
+mcro macroAlpha
     add r2, *r3
     cmp r1, #20
     bne routineOne
-endmacr
+mcroend
 
-macr macroBeta
+mcro macroBeta
     sub *r5, r6
     jsr routineTwo
     dec r4
-endmacr
+mcroend
 
-macr macroGamma
+mcro macroGamma
     mov r3, *r4
     prn r5
     clr *r2
-endmacr
+mcroend
 
-macr bigMacroNew
+mcro bigMacroNew
     mov r2, *r4
     add r3, r5
     sub r1, *r6
@@ -24,7 +24,7 @@ macr bigMacroNew
     bne routineThree
     jsr routineFour
     prn r7
-endmacr
+mcroend
 
 .extern routineOne
 

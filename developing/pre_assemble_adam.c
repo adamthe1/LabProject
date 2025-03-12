@@ -30,7 +30,7 @@ otherwise, return to 6.
  * @param file_name - the name of the file to check.
  * @return int - returns 1 if the pre_assembler has finished successfuly and 0 if it hasn't.
  */
-int preprocess(char* file_name){
+int preprocess2(char* file_name){
     
     FILE *fp, *fp2;
     char* str, *temp, *temp_code="", *code;

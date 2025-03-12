@@ -160,7 +160,7 @@ int mcro_letters(char* name){
     {
         if(i == MAX_MCRO_LENGTH){
             /*error*/
-            printf("error8");
+            printf("error8\n");
             return 0;
         }
 
@@ -250,7 +250,10 @@ void extra_spaces(char* s){
     if(temp_s == NULL){
         return;
     }
+<<<<<<< HEAD
     
+=======
+>>>>>>> LabProject/Afek
     while(s[i] != '\0'){
         if(s[i] == ' ' || s[i] == '\t'){
             if(s[i] == '\t'){

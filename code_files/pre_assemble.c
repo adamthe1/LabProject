@@ -5,6 +5,7 @@
 #include "../headers/pre_assemble.h"
 #include "../headers/helper.h"
 #include "../headers/define.h"
+#include "../headers/errors.h"
 
 /*
 algorithem:
@@ -29,65 +30,111 @@ otherwise, return to 6.
  * @param file_name - the name of the file to check.
  * @return int - returns 1 if the pre_assembler has finished successfuly and 0 if it hasn't.
  */
+
 int preprocess(char* file_name){
+    
     FILE *fp, *fp2;
+    /*fp=as file pointer, fp2=am file pointer*/
     char* str, *temp, *temp_code="", *code;
+    /*str=the next line, temp=copy of str to check, temp_code=the code of the current mcro, code=the code to replace macro name*/
     int mcro_flag = 0, linecount = 0;
+    /*mcro_flag=flag to know if the text is a macro code*/
     fp = fopen(file_name, "r+");
     fp2 = fopen(strcat(strtok(file_name,"."),".am"), "w");
-    if (fp == NULL) {
-        /*error - opening file failed*/
+    if (!fp) {
+        report_error(linecount,Error_1);/*can't open file*/
         return 0;
     }
+    
     while(fp != NULL){
-        if (!fgets(str,MAX_LINE_LENGTH, fp) || str == NULL){
-            /*ERROR*/
+        str = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
+        if (!str) {
+            report_error(linecount,Error_4);/*Memory allocation failed*/
+            return 0;
+        }
+        
+        if (!fgets(str, MAX_LINE_LENGTH, fp)) {
+            if (feof(fp)) {/*End of file*/
+                ;
+            } else {
+                report_error(linecount, Error_5); /* Reading text failed */
+            }
+            free(str);
             break;
         }
+        
+        temp = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
+        if (!temp) {
+            report_error(linecount,Error_4);/*Memory allocation failed*/
+            free(str);
+            return 0;
+        }
+        
+        if (temp_code == NULL || strlen(temp_code) == 0) {
+            temp_code = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
+            if (!temp_code) {
+                report_error(linecount,Error_4);/*Memory allocation failed*/
+                free(str);
+                free(temp);
+                return 0;
+            }
+            temp_code[0] = '\0';/* Initialize as empty string */
+        }
         linecount++;
-        strcpy(temp,str);
-        extra_spaces(temp);
+        strcpy(temp,str);/*copy str into temp to check temp without changing str*/
+        extra_spaces(temp);/*remove extra xpaces from temp to make the checks easier*/
         /*step2*/
-        temp = strtok(temp, " ");
-        if(get_macro(temp)){
+        temp = strtok(temp, " ");/*temp = the next word*/
+        if(temp){/*if temp != null*/
+            if(strlen(temp) > 0 && temp[strlen(temp)-1] == '\n'){
+                temp[strlen(temp)-1] = '\0';/*remove the enter char*/
+            }     
+        }
+        if(get_macro(temp)){/*if temp is a macro name which was declared before*/
             code = get_macro_code(temp);
-            fprintf(fp2,code);
+            fprintf(fp2,"%s",code);/*prints the macro code instead of its name*/
             continue;
         }
         /*step3*/
-        if(strcmp(temp,"mcro")){
+        if(!strcmp(temp,"mcro")){
             temp = strtok(NULL, " ");
             if(!temp){
-                /*error*/
+                report_error(linecount,Error_2);/*Unvalid macro declaration*/
                 return 0;
             }
             /*checks that there are no extra chars in the line of the macro declaration*/
-            if(strtok(NULL, " ") || !valid_macro_dec(temp)){
-                /*error*/
+            if(strlen(temp) > 0 && temp[strlen(temp)-1] == '\n'){
+                temp[strlen(temp)-1] = '\0';
+            }
+            if(!valid_macro_dec(temp)){
+                report_error(linecount,Error_2);/*Unvalid macro declaration*/
                 return 0;
             }
-            mcro_flag = 1;
-            create_macro(temp, linecount);
+            mcro_flag = 1;/*macro declaration*/
+            create_macro(temp, linecount);/*create a macro with the name temp*/
             continue;
         }
+        
         if (mcro_flag==1)
         {
-            if(strcmp(strtok(temp, " "),"mcroend")){
-                /*checks that there are no extra chars in the line of the macroend declaration*/
-                if(strtok(NULL, " ")){
-                    /*error*/
+            if(!strcmp(temp,"mcroend")){/*if the macro code has ended*/
+                if(strtok(NULL, " ")){/*checks that there are no extra chars in the line of the macroend declaration*/
+                    report_error(linecount,Error_3);/*Unvalid macroend declaration*/
                     return 0;
                 }
-                add_code_to_macro(temp_code);
-                mcro_flag = 0;
+                add_code_to_macro(temp_code);/*aads the whole macro code to the macro*/
+                temp_code = "";/*initilazes the temp_code*/
+                mcro_flag = 0;/*macro declaration has ended*/
                 continue;
             }
-            strcat(temp_code,str);
-        }
-        fprintf(fp2,str);
+            strcat(temp_code,str);/*adds the current line to the temp_code*/
+            continue;
+            }
+            fprintf(fp2,"%s",str);/*prints regular lines only in the am file*/
     }
-        
+     return 1;   
 }
+
 
 /**
  * @brief This function chaecks the validation of the macro name.
@@ -97,28 +144,17 @@ int preprocess(char* file_name){
  */
 int valid_macro_dec(char *mcro_name)
 {
-    /*checks that the mcro name is not null*/
-    char* temp;
-    /*first call to strtok is in the funtion that calls this function*/
-    temp = strtok(NULL, " \n");
-    if(!temp)
-    {
-        /*error*/
-        return 0;
-    }
-
     /*checks that the mcro name is not a name of operation/instruction/register*/
-    if(!cmp_mcro_name(temp)){
+    if(!cmp_mcro_name(mcro_name)){
         /*error - invalid mcro name*/
         return 0;
     }
 
     /*checks if the mcro name starts with a letter or _ and contains alphanumeric characters or _
     and that its legnth is not greater than 31*/
-    if(!mcro_letters(temp)){
+    if(!mcro_letters(mcro_name)){
        /*error - invalid mcro name*/
        return 0; 
-    }
-        
+    }   
     return 1;
 }
