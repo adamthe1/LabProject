@@ -250,10 +250,6 @@ void extra_spaces(char* s){
     if(temp_s == NULL){
         return;
     }
-<<<<<<< HEAD
-    
-=======
->>>>>>> LabProject/Afek
     while(s[i] != '\0'){
         if(s[i] == ' ' || s[i] == '\t'){
             if(s[i] == '\t'){

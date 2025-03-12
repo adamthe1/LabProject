@@ -23,4 +23,4 @@ int preprocess(char* file_name);
 int valid_macro_dec(char* mcro_name);
 
 
-#endif // _PREASSEMBLE_H
+#endif

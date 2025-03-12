@@ -10,7 +10,7 @@
  * @param file - The assembly source file
  * @return int - 1 if successful, 0 if errors were found
  */
-int first_pass(FILE* file);
+int first_pass(char* file_name);
 
 /**
  * @brief Parses a line and determines if it has a label

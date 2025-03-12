@@ -6,6 +6,8 @@
 #include "../headers/helper.h"
 #include "../headers/define.h"
 #include "../headers/pre_assemble.h"
+#include "../headers/first_pass.h"
+#include "../headers/label_data_struct.h"
 
 /**
  * @brief The main function of the assembler program.
@@ -43,6 +45,14 @@ int main(int argc, char *argv[])
             continue;
 
         printf("Preprocessing finished\n");
+
+        file_name = change_suffix(file_name, ".am");
+        
+        printf("Starting first pass on %s\n", file_name);
+        if (first_pass(file_name) == 0)
+            continue;
+        printf("First pass finished\n");
+        print_label_table();
     }
     return 0;
 }

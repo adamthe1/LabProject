@@ -15,14 +15,16 @@ static int line_number = 0;
 static int error_found = 0;
 
 
-int first_pass(FILE* file) {
+int first_pass(char* file_name) {
     int DC = 0;
     int IC = 100;
     int symbol_flag = 0;
     char label_name[MAX_LABEL_LEN];
     int inst_type;
     char* pos;
+    FILE* file;
     
+    file = fopen(file_name, "r");
     line_number = 0;
     error_found = 0;
     
@@ -31,7 +33,6 @@ int first_pass(FILE* file) {
     
     while (fgets(line, sizeof(line), file)) {
         line_number++;
-        
         /* Remove newline character if present */
         pos = strchr(line, '\n');
         if (pos) *pos = '\0';
@@ -126,6 +127,7 @@ int first_pass(FILE* file) {
         error_found = 1;
     }
     
+    fclose(file);
     return !error_found;
 }
 

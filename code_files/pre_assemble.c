@@ -132,6 +132,8 @@ int preprocess(char* file_name){
             }
             fprintf(fp2,"%s",str);/*prints regular lines only in the am file*/
     }
+    fclose(fp);
+    fclose(fp2);
      return 1;   
 }
 
