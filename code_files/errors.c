@@ -4,11 +4,11 @@
 
 Error error_list[] = {
     {Error_0, "Error 0: Not enough arguments in command\n"},
-    {Error_1, "Error 1: Failed to open file\n"},
-    {Error_2, "Error 2: Blank\n"},
-    {Error_3, "Error 3: Blank\n"},
-    {Error_4, "Error 4: Blank\n"},
-    {Error_5, "Error 5: Blank\n"},
+    {Error_1, "Error 1: Can't open file\n"},
+    {Error_2, "Error 2: Unvalid macro declaration\n"},
+    {Error_3, "Error 3: Unvalid macroend declaration\n"},
+    {Error_4, "Error 4: Error: Memory allocation failed\n"},
+    {Error_5, "Error 5: Reading text failed\n"},
     {Error_6, "Error 6: Blank\n"},
 
     {Error_7, "Error 7: Label name already in label table"},
