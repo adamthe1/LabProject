@@ -5,11 +5,11 @@
 Error error_list[] = {
     {Error_0, "Error 0: Not enough arguments in command\n"},
     {Error_1, "Error 1: Can't open file\n"},
-    {Error_2, "Error 2: Unvalid macro declaration\n"},
+    {Error_2, "Error 2: Extra chars in macro declaration line\n"},
     {Error_3, "Error 3: Unvalid macroend declaration\n"},
     {Error_4, "Error 4: Error: Memory allocation failed\n"},
     {Error_5, "Error 5: Reading text failed\n"},
-    {Error_6, "Error 6: Blank\n"},
+    {Error_6, "Error 6: There is no macro name\n"},
 
     {Error_7, "Error 7: Label name already in label table"},
     {Error_8, "Error 8: Label name is too long\n"},
@@ -37,6 +37,7 @@ Error error_list[] = {
     {Error_30, "Error 30: Syntax error in operand 2\n"},
     {Error_31, "Error 31: Invalid operand\n"},
     {Error_32, "Error 32: Line after Label cannot be empty\n"},
+    {Error_33, "Error 33: Unvalid macro name\n"},
 };
 
 void report_error(int line_num, int error_num){

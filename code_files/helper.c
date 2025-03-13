@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 #include "../headers/helper.h"
 #include "../headers/define.h"
 
@@ -152,7 +153,6 @@ int mcro_letters(char* name){
     int i = 0;
     if(!isalpha(name[i])){
         /*error*/
-        printf("error7");
         return 0;
     }
     i++;
@@ -160,13 +160,11 @@ int mcro_letters(char* name){
     {
         if(i == MAX_MCRO_LENGTH){
             /*error*/
-            printf("error8\n");
             return 0;
         }
 
         if(name[i] != '_' && !isalnum(name[i])){
             /*error*/
-            printf("error9 %s, %c",name, name[i]);
             return 0;
         }
         i++;
@@ -246,37 +244,36 @@ char* copy_string(char* s){
  */
 void extra_spaces(char* s){
     char* temp_s = (char*)malloc(strlen(s) + 1);
-    int i=0,j=0, space=1;
+    int i=0,j=0, space=0,letter=0;
     if(temp_s == NULL){
         return;
     }
-    while(s[i] != '\0'){
-        if(s[i] == ' ' || s[i] == '\t'){
-            if(s[i] == '\t'){
+    while(s[i] != '\0' && s[i] != '\n'){
+        if(s[i]==' ' || s[i]=='t'){
+            if(s[i] != ' '){
                 s[i] = ' ';
             }
-            if(space == 0){
+            if(space == 0 && letter==1){
                 space=1;
-                temp_s[j] = s[i];
-                i++;
-                j++;
+                /*temp_s[j] = s[i];*/
             }
-            else{
-                i++;
-            }
+            i++;
         }
         else{
-            if(space == 1){
+            if(space==1&&letter==1){
+                temp_s[j++]=' ';
                 space=0;
             }
             temp_s[j] = s[i];
             i++;
             j++;
+            letter=1;
         }
     }
-    temp_s[++j] = '\0';
+    temp_s[j] = '\0';
     strcpy(s,temp_s);
 }
+
 
 
 char* skip_whitespace(char* str) {

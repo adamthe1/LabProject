@@ -44,7 +44,12 @@ int add_code_to_macro(char* code){
     while(current->next != NULL){
         current = current->next;
     }
-    current->code = code;
+    current->code = (char*)malloc(strlen(code) + 1);
+    if (!current->code) {
+        printf("Memory allocation failed for macro code\n");
+        return 0;
+    }
+    strcpy(current->code, code);
     return 1;
 }
 

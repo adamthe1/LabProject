@@ -35,25 +35,32 @@ int preprocess(char* file_name){
     
     FILE *fp, *fp2;
     /*fp=as file pointer, fp2=am file pointer*/
-    char* str, *temp, *temp_code="", *code;
-    /*str=the next line, temp=copy of str to check, temp_code=the code of the current mcro, code=the code to replace macro name*/
+    char* str,*str2, *temp, *temp_code, *code, *rest;
+    /*str=the next line,str2=copy of str to use in strtok, temp=token of str2-the next word in the line,
+      temp_code=the code of the current mcro, code=the code to replace macro name, rest=extra chars in the declaration lines*/
     int mcro_flag = 0, linecount = 0;
     /*mcro_flag=flag to know if the text is a macro code*/
+
     fp = fopen(file_name, "r+");
-    fp2 = fopen(strcat(strtok(file_name,"."),".am"), "w");
     if (!fp) {
         report_error(linecount,Error_1);/*can't open file*/
         return 0;
     }
+    fp2 = fopen(strcat(strtok(file_name,"."),".am"), "w");/*add .am to the file name*/
+    if (!fp2) {
+        report_error(linecount,Error_1);/*can't open file*/
+        return 0;
+    }
     
-    while(fp != NULL){
+    /*the loop ends when the file ends*/
+    while (!feof(fp)) {
         str = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
         if (!str) {
             report_error(linecount,Error_4);/*Memory allocation failed*/
             return 0;
         }
-        
-        if (!fgets(str, MAX_LINE_LENGTH, fp)) {
+        /*reads the next line into str*/
+        if (!fgets(str, MAX_LINE_LENGTH, fp)){
             if (feof(fp)) {/*End of file*/
                 ;
             } else {
@@ -64,50 +71,62 @@ int preprocess(char* file_name){
         }
         
         temp = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
-        if (!temp) {
+        if (!temp){
             report_error(linecount,Error_4);/*Memory allocation failed*/
             free(str);
             return 0;
         }
-        
-        if (temp_code == NULL || strlen(temp_code) == 0) {
+
+        str2 = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
+        if (!str2){
+            report_error(linecount,Error_4);/*Memory allocation failed*/
+            free(str);
+            free(temp);
+            return 0;
+        }
+
+        if (temp_code == NULL || strlen(temp_code) == 0){
             temp_code = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
             if (!temp_code) {
                 report_error(linecount,Error_4);/*Memory allocation failed*/
                 free(str);
                 free(temp);
+                free(str2);
                 return 0;
             }
             temp_code[0] = '\0';/* Initialize as empty string */
         }
+
         linecount++;
-        strcpy(temp,str);/*copy str into temp to check temp without changing str*/
-        extra_spaces(temp);/*remove extra xpaces from temp to make the checks easier*/
+        strcpy(str2,str);/*copy str into str2 to use strtok without changing str*/
+        extra_spaces(str2);/*remove extra spaces from str2 to make the checks easier*/
         /*step2*/
-        temp = strtok(temp, " ");/*temp = the next word*/
-        if(temp){/*if temp != null*/
-            if(strlen(temp) > 0 && temp[strlen(temp)-1] == '\n'){
-                temp[strlen(temp)-1] = '\0';/*remove the enter char*/
-            }     
+        temp = strtok(str2, " ");/*temp = the first word*/
+
+        if(!temp){/*if the line is empty*/
+            continue;
         }
+
         if(get_macro(temp)){/*if temp is a macro name which was declared before*/
             code = get_macro_code(temp);
+            printf("%s",code);
             fprintf(fp2,"%s",code);/*prints the macro code instead of its name*/
             continue;
         }
         /*step3*/
-        if(!strcmp(temp,"mcro")){
-            temp = strtok(NULL, " ");
-            if(!temp){
-                report_error(linecount,Error_2);/*Unvalid macro declaration*/
+        if(!strcmp(temp,"mcro")){/*A start of macro declaration*/
+            temp = strtok(NULL, " ");/*macro name*/
+            rest = strtok(NULL," ");/*the rest of the line*/
+            if(rest){
+                report_error(linecount,Error_2);/*Extra chars in macro declaration line*/
                 return 0;
             }
-            /*checks that there are no extra chars in the line of the macro declaration*/
-            if(strlen(temp) > 0 && temp[strlen(temp)-1] == '\n'){
-                temp[strlen(temp)-1] = '\0';
+            if(!temp){
+                report_error(linecount,Error_6);/*There is no macro name*/
+                return 0;
             }
             if(!valid_macro_dec(temp)){
-                report_error(linecount,Error_2);/*Unvalid macro declaration*/
+                report_error(linecount,Error_33);/*Unvalid macro name*/
                 return 0;
             }
             mcro_flag = 1;/*macro declaration*/
@@ -115,23 +134,26 @@ int preprocess(char* file_name){
             continue;
         }
         
-        if (mcro_flag==1)
-        {
+        if (mcro_flag==1){
             if(!strcmp(temp,"mcroend")){/*if the macro code has ended*/
-                if(strtok(NULL, " ")){/*checks that there are no extra chars in the line of the macroend declaration*/
+                rest = strtok(NULL," ");
+                if(rest){/*checks that there are no extra chars in the line of the macroend declaration*/
                     report_error(linecount,Error_3);/*Unvalid macroend declaration*/
                     return 0;
                 }
-                add_code_to_macro(temp_code);/*aads the whole macro code to the macro*/
-                temp_code = "";/*initilazes the temp_code*/
+                add_code_to_macro(temp_code);/*adds the whole macro code to the macro*/
+                temp_code[0] = '\0';/*initilazes the temp_code*/
                 mcro_flag = 0;/*macro declaration has ended*/
                 continue;
             }
             strcat(temp_code,str);/*adds the current line to the temp_code*/
             continue;
-            }
+        }
             fprintf(fp2,"%s",str);/*prints regular lines only in the am file*/
     }
+    free(str);
+    free(temp);
+    free(temp_code);
     fclose(fp);
     fclose(fp2);
      return 1;   
