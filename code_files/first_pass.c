@@ -129,6 +129,7 @@ int first_pass(char* file_name) {
     }
     
     fclose(file);
+    
     if(!error_found){
         return second_pass(file_name,&IC,&DC);
     }

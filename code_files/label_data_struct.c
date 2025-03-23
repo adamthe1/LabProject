@@ -67,6 +67,7 @@ int add_entry(char* label_name){
         return 0; /*error - not a labael name*/
     }
     temp->is_entry = 1;
+    return 1;
 }
 
 

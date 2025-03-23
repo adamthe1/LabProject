@@ -278,14 +278,14 @@ void reset_label_table();
 
 int main() {
     printf("=== Running First Pass Tests ===\n\n");
-    /*
+    
     test_parse_label();
     test_identify_instruction();
     test_process_data_directive();
     test_process_string_directive();
     test_process_extern_directive();
     
-    test_process_operation();*/
+    test_process_operation();
     test_first_pass();
     
     printf("\n=== All tests completed ===\n");
@@ -577,24 +577,7 @@ void test_process_extern_directive() {
 
 void test_first_pass() {
     printf("Testing first_pass function...\n");
-    
-    /* Create a temporary assembly file for testing */
-    FILE *temp = fopen("test_first_pass.am", "w");
-    if (temp == NULL) {
-        printf("Failed to create test file\n");
-        return;
-    }
-    
-    /* Write test assembly code */
-    fprintf(temp, "; Test assembly code\n");
-    fprintf(temp, ".extern EXTERNAL\n");
-    fprintf(temp, "DATA_LABEL: .data 100, 200, 300\n");
-    fprintf(temp, "STRING_LABEL: .string \"Hello\"\n");
-    fprintf(temp, "\n"); /* Empty line test */
-    fprintf(temp, "; Comment line test\n");
-    fprintf(temp, "CODE_LABEL: mov r1, r2\n");
-    
-    fclose(temp);
+    FILE* temp;
     
     /* Open file for reading */
     temp = fopen("example.am", "r");
@@ -605,7 +588,7 @@ void test_first_pass() {
     
     /* Run first pass */
     /*int result = first_pass(temp);*/
-    int result = first_pass("example");
+    int result = first_pass("example.am");
     fclose(temp);
     
     printf("First pass result: %d (0=errors found, 1=success)\n", result);
