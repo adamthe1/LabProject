@@ -180,16 +180,14 @@ int identify_instruction(char* line) {
     line = skip_whitespace(line);
     
     /* Check for directives */
-    /*TODO
-    change the strncmp because we need to check that the eord is not .datak for example*/
     if (*line == '.') {
-        if (strncmp(line, ".data", 5) == 0) {
+        if (strncmp(line, ".data ", 5) == 0) {
             return INST_TYPE_DATA;
-        } else if (strncmp(line, ".string", 7) == 0) {
+        } else if (strncmp(line, ".string ", 7) == 0) {
             return INST_TYPE_STRING;
-        } else if (strncmp(line, ".entry", 6) == 0) {
+        } else if (strncmp(line, ".entry ", 6) == 0) {
             return INST_TYPE_ENTRY;
-        } else if (strncmp(line, ".extern", 7) == 0) {
+        } else if (strncmp(line, ".extern ", 7) == 0) {
             return INST_TYPE_EXTERN;
         }
     }
