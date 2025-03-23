@@ -12,7 +12,7 @@
      char* name;
      char type;
      int is_entry;
-     int line_index;/*needs to be changed to IC/DC*/
+     int line_index; /* linbe index is IC or DC*/
      struct Label* next;
  } Label;
  
@@ -118,9 +118,52 @@ void free_binary_code();
 
 int add_IC_to_DC(int IC_index);
 
+typedef struct Unknown_label{
+    char* name;
+    int IC_index;
+    int type;
+    int line_number;
+    struct Unknown_label* next;
+} Unknown_label;
+
+/**
+ * @brief This function creates a new unknown label node and adds it to the list.
+ *  
+ * @param name - the name of the label.
+ * @param IC_index - the index of IC in the file.
+ * @param type - the type of the unknown label (direct or relative).
+ * @return int - 1 if the data was created successfully, 0 otherwise.
+ */
+
+int create_unknown_label(char* name, int IC_index, int type, int line_number);
+
+/**
+ * @brief This function returns the unknown label with the given name.
+ * 
+ * @param name - the name of the label.
+ * @return Unknown_label* - the label.
+ */
+
+Unknown_label* get_unknown_label(char* name);
+
+/**
+ * @brief This function frees the memory allocated for the unknown label list.
+ * 
+ */
+
+void free_unknown_labels();
+
+/**
+ * @brief This function returns the head of Unknown_label.
+ * 
+ */
+
+Unknown_label* get_unknown_head();
+
 
 void print_label_table();
 void print_data_table();
 void print_code_table();
+void print_unknown_table();
 
  #endif

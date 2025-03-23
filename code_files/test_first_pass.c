@@ -317,6 +317,12 @@ void print_tables() {
     print_code_table();
     /* Otherwise you'll need to implement one that iterates through your code */
     printf("--------------------------\n");
+
+    printf("\n--- Current unknown Table ---\n");
+    /* If you have a function to print all unknown labels, call it here */
+    print_unknown_table();
+    /* Otherwise you'll need to implement one that iterates through your unknown labels */
+    printf("--------------------------\n");
 }
 
 void test_parse_label() {
@@ -589,6 +595,7 @@ void test_first_pass() {
     
     /* Run first pass */
     /*int result = first_pass(temp);*/
+    
     int result = first_pass("example.am");
     fclose(temp);
     

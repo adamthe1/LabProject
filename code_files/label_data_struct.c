@@ -8,6 +8,7 @@
 static Label* head = NULL;
 static Data_binary* data_head = NULL;
 static Code_binary* code_head = NULL;
+static Unknown_label *unknown_head = NULL;
 
 int create_label(char* name, char type, int line_index){
 
@@ -204,6 +205,61 @@ void free_binary_code(){
     }
 }
 
+int create_unknown_label(char* name, int IC_index, int type, int line_number){
+    Unknown_label* new_label = (Unknown_label*)malloc(sizeof(Unknown_label));
+
+    if(new_label == NULL) {
+        return 0;
+    }
+
+    new_label->name = name;
+    new_label->IC_index = IC_index;
+    new_label->type = type;
+    new_label->line_number = line_number;
+    new_label->next = NULL;
+
+    if(unknown_head == NULL) {
+        unknown_head = new_label;
+    } else {
+        Unknown_label* current = unknown_head;
+        while(current->next != NULL) {
+            current = current->next;
+        }
+        current->next = new_label;
+    }
+    return 1;
+}
+
+Unknown_label* get_unknown_label(char* name) {
+    Unknown_label* current = unknown_head;
+    while(current != NULL) {
+        if(strcmp(current->name, name) == 0) {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
+void free_unknown_labels() {
+    Unknown_label* current = unknown_head;
+    Unknown_label* next;
+    while(current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+}
+
+Unknown_label* get_unknown_head(){
+    if(unknown_head){
+        return unknown_head;
+    }
+    return NULL;
+}
+
+
+
 void print_label_table(){
     Label* current = head;
     while(current != NULL){
@@ -234,6 +290,14 @@ void print_code_table(){
         printf("  ");
         
         printf("Code: %d, IC: %d\n", current->binary, current->IC_index);
+        current = current->next;
+    }
+}
+
+void print_unknown_table(){
+    Unknown_label* current = unknown_head;
+    while(current != NULL){
+        printf("Unknown label: %s, Type: %d, IC: %d, Line: %d\n", current->name, current->type, current->IC_index, current->line_number);
         current = current->next;
     }
 }

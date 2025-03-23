@@ -37,8 +37,10 @@ Error error_list[] = {
     {Error_31, "Error 31: Invalid operand\n"},
     {Error_32, "Error 32: Line after Label cannot be empty\n"},
     {Error_33, "Error 33: Unvalid macro name\n"},
-    {Error_34, "Error 34: Label name doesn't existe in the label table\n"},
-    {Error_35, "Error 35: Line too long (over 81 char)"}
+    {Error_34, "Error 34: Label name doesn't exist in the label table\n"},
+    {Error_35, "Error 35: Line too long (over 81 char)"},
+    {Error_36, "Error 36: External label in relative addressing mode\n"},
+    {Error_37, "Error 37: No binary code with that IC\n"},
 };
 
 void report_error(int line_num, int error_num){

@@ -1,12 +1,4 @@
-
-
-
-
 .extern routineOne
-
-start:      mov r2, r3
-            prn textOne
-            lea addrOne, r4
 
 .entry loopStart
 

@@ -131,6 +131,7 @@ int first_pass(char* file_name) {
         report_error(line_number, Error_28); /*Failed to create binary code*/
         error_found = 1;
     }
+    DC = DC + IC;
     
     fclose(file);
     
@@ -696,15 +697,21 @@ int encode_operand(char* operand, int addr_mode, int* IC) {
             
         case ADDR_MODE_DIRECT:
             /* Direct addressing: 21 bits for address, ARE = 010 (relocatable) or 100 (external) */
-            label = operand;
+            label = copy_string(operand);
             label_entry = get_label(label);
             
             if (label_entry == NULL) {
                 /* Label not found - will be resolved in second pass */
                 operand_word = UKNOWN_LABEL_DIRECT; 
+                if (!create_unknown_label(label, *IC, UKNOWN_LABEL_DIRECT, line_number)) {
+                    report_error(line_number, Error_28);/*Failed to create binary code*/
+                    return 0;
+                }
             } else if (label_entry->type == EXTERN_TYPE) {
-                operand_word = 0; 
-                operand_word |= 4; /* ARE = 100 (external) */
+                if (!create_unknown_label(label, *IC, UKNOWN_LABEL_DIRECT, line_number)) {
+                    report_error(line_number, Error_28);/*Failed to create binary code*/
+                    return 0;
+                }
             } else {
                 operand_word = (label_entry->line_index & 0x1FFFFF) << 3; /* 21-bit address */
                 operand_word |= 2; /* ARE = 010 (relocatable) */
@@ -713,15 +720,24 @@ int encode_operand(char* operand, int addr_mode, int* IC) {
             
         case ADDR_MODE_RELATIVE:
             /* Relative addressing: 21 bits for offset, ARE = 001 (absolute) */
-            label = operand + 1; /* Skip the & */
+            label = copy_string(operand); /* Skip the & */
+            label += 1;
             label_entry = get_label(label);
             
             if (label_entry == NULL) {
                 /* Label not found - will be resolved in second pass */
                 operand_word = UKNOWN_LABEL_RELATIVE; 
+            }
+            else if (label_entry->type == EXTERN_TYPE) {
+                report_error(line_number, Error_36); /*external label in relative addressing mode*/
+                return 0;
             } else {
                 /* Calculate distance (will be done in second pass) */
                 operand_word = UKNOWN_LABEL_RELATIVE; 
+            }
+            if (!create_unknown_label(label, *IC, UKNOWN_LABEL_RELATIVE, line_number)) {
+                report_error(line_number, Error_28);/*Failed to create binary code*/
+                return 0;
             }
             break;
             
