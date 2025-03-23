@@ -19,7 +19,7 @@ Error error_list[] = {
     {Error_13, "Error 13: Number out of range\n"},
     {Error_14, "Error 14: Syntax error in .string directive\n"},
     {Error_15, "Error 15: Extranous text after command\n"},
-    {Error_16, "Error 16: Malformed .extern directive\n"},
+    {Error_16, "Error 16: Malformed .entry directive\n"},
     {Error_17, "Error 17: Missing .string directive\n"},
     {Error_18, "Error 18: Missing .extern directive\n"},
     {Error_19, "Error 19: Failed to create extern\n"},

@@ -36,12 +36,30 @@ static int error_found = 0;
 
 int second_pass(char* file_name ,int* IC, int* DC){
     int symbol_flag = 0;
-    char *token;
+    char *label_name;
     char *temp_line;
     char label_name[MAX_LABEL_LEN];
     int inst_type, i;
     char* pos;
+    char* colon_pos;
     FILE* file, *fp_ob,*fp_ext,*fp_ent;
+    Label* current;
+    fp_ext = fopen(change_suffix(file_name,".ext"), "w");/*add .ext to the file name*/
+    if (!fp_ext) {
+        report_error(line_number,Error_1);/*can't open file*/
+        return 0;
+    }
+    fp_ob = fopen(change_suffix(file_name,".ob"), "w");/*add .ob to the file name*/
+    if (!fp_ob) {
+        report_error(line_number,Error_1);/*can't open file*/
+        return 0;
+    }
+    fp_ent = fopen(change_suffix(file_name,".ent"), "w");/*add .ent to the file name*/
+    if (!fp_ent) {
+        report_error(line_number,Error_1);/*can't open file*/
+        return 0;
+    }
+    
     
     temp_line = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
     if (!temp_line){
@@ -49,8 +67,8 @@ int second_pass(char* file_name ,int* IC, int* DC){
         return 0;
     }
 
-    token = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
-    if (!token){
+    label_name = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
+    if (!label_name){
         report_error(line_number,Error_4);/*Memory allocation failed*/
         free(temp_line);
         return 0;
@@ -79,34 +97,49 @@ int second_pass(char* file_name ,int* IC, int* DC){
         /*step 2*/
         /*If(the first field in the line is a symbol (label)) - skip it*/
         strcpy(temp_line,line);/*temp_line is copy of str for the strtok function*/
-        token = strtok(temp_line, " \t");
-        if(get_label(token)){
-            memmove(line, line + strlen(token), strlen(line));
+        colon_pos = strchr(line, ':');
+        if (colon_pos != NULL) {
+            temp_line = colon_pos + 1;
         }
+        temp_line = skip_whitespace(temp_line);
 
         /*step 3*/
-        if(identify_instruction(line) == INST_TYPE_DATA
-            || identify_instruction(line) == INST_TYPE_STRING
-           || identify_instruction(line) == INST_TYPE_EXTERN){
+        inst_type = identify_instruction(line);
+        if(inst_type == INST_TYPE_DATA || inst_type == INST_TYPE_STRING || inst_type == INST_TYPE_EXTERN)
             continue;
-           }
+           
 
         /*step 4*/
-        if(identify_instruction(line) == INST_TYPE_ENTRY){
+        if(inst_type == INST_TYPE_ENTRY){
             /*steps 5*/
-            token = strtok(NULL, " \t");
-            if(!get_label(token)){
-                report_error(line_number,Error_34);/*Label name doesn't existe in the label table*/
+            temp_line += 6;/*skip the ".entry"*/
+            temp_line = skip_whitespace(temp_line);
+            
+            i = 0;
+            while (*temp_line && !isspace((unsigned char)*temp_line)) {
+                label_name[i++] = *temp_line++;
             }
-            add_entry(token);
+            label_name[i] = '\0';
+
+            if (!is_valid_label_name(label_name)) {
+                report_error(line_number,Error_9);/*Invalid label name*/
+                error_found = 1;
+                continue;
+            }
+
+            if (!get_label(label_name)){
+                report_error(line_number,Error_34);/*Label name doesn't existe in the label table*/
+                error_found = 1;
+                continue;
+            }
+
+            add_entry(label_name);
             continue;
         }
             
-        /*step 6*/
-        if(identify_instruction(line) != INST_TYPE_OPERATION){
-            /*error - not instruction or operation*/
-        }
-        if(!process_operation2(line,IC)){
+        /*step 6 it is an command*/
+        
+        if(!process_operation2(line, IC, fp_ext)){
             /*error*/
         }   
     }
@@ -114,27 +147,28 @@ int second_pass(char* file_name ,int* IC, int* DC){
     fclose(file);
     if(error_found){/*if there is at least 1 error in the file found in the second pass*/
         printf("Errors were found during the second pass in the file, assembler  process can't be completed\n");
+        /* delete all files*/
+        remove(change_suffix(file_name,".ob"));
+        remove(change_suffix(file_name,".ext"));
+        remove(change_suffix(file_name,".ent"));
+        fclose(fp_ob);
+        fclose(fp_ent);
+        fclose(fp_ext);
         return 0;
     }
     /*step 8 - bulid the output files*/
 
-    fp_ob = fopen(change_suffix(file_name,".ob"), "w");/*add .ob to the file name*/
-    if (!fp_ob) {
-        report_error(line_number,Error_1);/*can't open file*/
-        return 0;
-    }
+    
     fprintf(fp_ob, "%d %d\n",IC-100,DC);/*print the file headline*/
     for(i = 100;i<*IC;i++){
         fprintf(fp_ob,"%07d 0x%06X\n",i,get_binary_code(i));
 
     }
-
-    fp_ent = fopen(change_suffix(file_name,".ent"), "w");/*add .ent to the file name*/
-    if (!fp_ent) {
-        report_error(line_number,Error_1);/*can't open file*/
-        return 0;
+    for (i = *IC+1; i < *DC; i++) {
+        fprintf(fp_ob,"%07d 0x%06X\n",i+*IC,get_data_code(i));
     }
-    Label* current = get_label_head();
+
+    current = get_label_head();
     while(current != NULL){
         if(current->is_entry){
             fprintf("%s %07d\n",current->name,current->line_index);
@@ -142,12 +176,6 @@ int second_pass(char* file_name ,int* IC, int* DC){
         current = current->next;
     }
 
-    
-    fp_ext = fopen(change_suffix(file_name,".ext"), "w");/*add .ext to the file name*/
-    if (!fp_ext) {
-        report_error(line_number,Error_1);/*can't open file*/
-        return 0;
-    }
     /*
 
     current = get_label_head();
@@ -168,7 +196,7 @@ int second_pass(char* file_name ,int* IC, int* DC){
 }
 
 
-int process_operation2(char* line, int* IC) {
+int process_operation2(char* line, int* IC, FILE* fp_ext){ 
     char* pos;
     char operation[MAX_OPERATION_LEN + 1];
     char operand1[MAX_OPERAND_LEN + 1] = {0};

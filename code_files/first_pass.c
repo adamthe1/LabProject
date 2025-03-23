@@ -392,7 +392,7 @@ int process_extern_directive(char* line) {
     /* Skip .extern directive */
     pos = strstr(line, ".extern");
     if (pos == NULL) {
-        report_error(line_number, Error_16);/*Malformed .extern directive*/
+        report_error(line_number, Error_18);/*Malformed .extern directive*/
         return 0;
     }
     pos += 7;  
