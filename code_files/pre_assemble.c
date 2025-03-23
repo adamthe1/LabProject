@@ -46,7 +46,7 @@ int preprocess(char* file_name){
         report_error(linecount,Error_1);/*can't open file*/
         return 0;
     }
-    fp2 = fopen(strcat(strtok(file_name,"."),".am"), "w");/*add .am to the file name*/
+    fp2 = fopen((change_suffix(file_name,".am")), "w");/*add .am to the file name*/
     if (!fp2) {
         report_error(linecount,Error_1);/*can't open file*/
         return 0;

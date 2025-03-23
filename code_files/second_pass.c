@@ -36,13 +36,15 @@ static int error_found = 0;
 
 int second_pass(char* file_name ,int* IC, int* DC){
     int symbol_flag = 0;
-    char *token, temp, label_name[MAX_LABEL_LEN];
+    char *token;
+    char *temp_line;
+    char label_name[MAX_LABEL_LEN];
     int inst_type, i;
     char* pos;
     FILE* file, *fp_ob,*fp_ext,*fp_ent;
     
-    temp = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
-    if (!temp){
+    temp_line = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
+    if (!temp_line){
         report_error(line_number,Error_4);/*Memory allocation failed*/
         return 0;
     }
@@ -50,7 +52,7 @@ int second_pass(char* file_name ,int* IC, int* DC){
     token = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
     if (!token){
         report_error(line_number,Error_4);/*Memory allocation failed*/
-        free(temp);
+        free(temp_line);
         return 0;
     }
 
@@ -76,8 +78,8 @@ int second_pass(char* file_name ,int* IC, int* DC){
 
         /*step 2*/
         /*If(the first field in the line is a symbol (label)) - skip it*/
-        strcpy(temp,line);/*temp is copy of str for the strtok function*/
-        token = strtok(temp, " \t");
+        strcpy(temp_line,line);/*temp_line is copy of str for the strtok function*/
+        token = strtok(temp_line, " \t");
         if(get_label(token)){
             memmove(line, line + strlen(token), strlen(line));
         }
@@ -115,7 +117,7 @@ int second_pass(char* file_name ,int* IC, int* DC){
         return 0;
     }
     /*step 8 - bulid the output files*/
-    fp_ob = fopen(strcat(strtok(file_name,"."),".ob"), "w");/*add .ob to the file name*/
+    fp_ob = fopen(change_suffix(file_name,".ob"), "w");/*add .ob to the file name*/
     if (!fp_ob) {
         report_error(line_number,Error_1);/*can't open file*/
         return 0;
@@ -126,7 +128,7 @@ int second_pass(char* file_name ,int* IC, int* DC){
 
     }
 
-    fp_ent = fopen(strcat(strtok(file_name,"."),".ent"), "w");/*add .ob to the file name*/
+    fp_ent = fopen(change_suffix(file_name,".ent"), "w");/*add .ent to the file name*/
     if (!fp_ent) {
         report_error(line_number,Error_1);/*can't open file*/
         return 0;
@@ -138,7 +140,7 @@ int second_pass(char* file_name ,int* IC, int* DC){
         }
     }
 
-    fp_ext = fopen(strcat(strtok(file_name,"."),".ext"), "w");/*add .ob to the file name*/
+    fp_ext = fopen(change_suffix(file_name,".ext"), "w");/*add .ext to the file name*/
     if (!fp_ext) {
         report_error(line_number,Error_1);/*can't open file*/
         return 0;
