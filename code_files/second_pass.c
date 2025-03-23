@@ -117,6 +117,7 @@ int second_pass(char* file_name ,int* IC, int* DC){
         return 0;
     }
     /*step 8 - bulid the output files*/
+
     fp_ob = fopen(change_suffix(file_name,".ob"), "w");/*add .ob to the file name*/
     if (!fp_ob) {
         report_error(line_number,Error_1);/*can't open file*/
@@ -138,21 +139,27 @@ int second_pass(char* file_name ,int* IC, int* DC){
         if(current->is_entry){
             fprintf("%s %07d\n",current->name,current->line_index);
         }
+        current = current->next;
     }
 
+    
     fp_ext = fopen(change_suffix(file_name,".ext"), "w");/*add .ext to the file name*/
     if (!fp_ext) {
         report_error(line_number,Error_1);/*can't open file*/
         return 0;
     }
+    /*
 
     current = get_label_head();
     while(current != NULL){
         if(current->is_entry){
             fprintf("%s %07d\n",current->name,current->line_index);
         }
+        current = current->next;
     }
-
+    */
+    
+    free(temp_line);
     fclose(fp_ob);
     fclose(fp_ent);
     fclose(fp_ext);
