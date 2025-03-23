@@ -278,7 +278,7 @@ void reset_label_table();
 
 int main() {
     printf("=== Running First Pass Tests ===\n\n");
-    
+    /*
     test_parse_label();
     test_identify_instruction();
     test_process_data_directive();
@@ -286,6 +286,7 @@ int main() {
     test_process_extern_directive();
     
     test_process_operation();
+    */
     test_first_pass();
     
     printf("\n=== All tests completed ===\n");

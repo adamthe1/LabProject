@@ -38,6 +38,7 @@ Error error_list[] = {
     {Error_32, "Error 32: Line after Label cannot be empty\n"},
     {Error_33, "Error 33: Unvalid macro name\n"},
     {Error_34, "Error 34: Label name doesn't existe in the label table\n"},
+    {Error_35, "Error 35: Line too long (over 81 char)"}
 };
 
 void report_error(int line_num, int error_num){

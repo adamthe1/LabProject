@@ -11,7 +11,7 @@
 #include "../headers/second_pass.h"
 
 /* Global variables */
-static char line[MAX_LINE_LENGTH + 1]; /* +1 for possible \n */
+static char line[MAX_LINE_LENGTH + 2]; /* +1 for possible \n */
 static int line_number = 0;
 static int error_found = 0;
 
@@ -33,6 +33,10 @@ int first_pass(char* file_name) {
     rewind(file);
     
     while (fgets(line, sizeof(line), file)) {
+        /* If the line len is larger than 81 error */
+        if (strlen(line) > 81) {
+            report_error(line_number, Error_35);
+        }
         line_number++;
         /* Remove newline character if present */
         pos = strchr(line, '\n');
@@ -124,7 +128,7 @@ int first_pass(char* file_name) {
     /* Update addresses for data labels to come after code */
     /* This would involve traversing your label table and updating addresses */
     if(!add_IC_to_DC(IC)){
-        report_error(line_number, Error_28);/*Failed to create binary code*/
+        report_error(line_number, Error_28); /*Failed to create binary code*/
         error_found = 1;
     }
     

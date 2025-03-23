@@ -123,8 +123,8 @@ int second_pass(char* file_name ,int* IC, int* DC){
         report_error(line_number,Error_1);/*can't open file*/
         return 0;
     }
-    fprintf("%d %d\n",IC-100,DC);/*print the file headline*/
-    for(i = 100;i<*IC+*DC;i++){
+    fprintf(fp_ob, "%d %d\n",IC-100,DC);/*print the file headline*/
+    for(i = 100;i<*IC;i++){
         fprintf(fp_ob,"%07d 0x%06X\n",i,get_binary_code(i));
 
     }
@@ -159,7 +159,7 @@ int second_pass(char* file_name ,int* IC, int* DC){
     }
     */
     
-    free(temp_line);
+    
     fclose(fp_ob);
     fclose(fp_ent);
     fclose(fp_ext);
