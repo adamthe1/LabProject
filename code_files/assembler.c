@@ -39,13 +39,13 @@ int main(int argc, char *argv[])
         file = look_for_file(file_name);
         if (file == NULL)
             continue;
-
+        /*
         printf("Starting preprocessing\n");
         if (preprocess(file_name) == 0)
             continue;
 
         printf("Preprocessing finished\n");
-
+        */
         file_name = change_suffix(file_name, ".am");
         
         printf("Starting first pass on %s\n", file_name);
