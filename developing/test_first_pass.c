@@ -9,6 +9,7 @@
 #include "../headers/helper.h"
 #include "../headers/analyze.h"
 
+void print_tables();
 /* Helper function to get opcode by name */
 
 void test_process_operation() {
@@ -603,7 +604,8 @@ void test_first_pass() {
     }
     
     /* Run first pass */
-    int result = first_pass(temp);
+    /*int result = first_pass(temp);*/
+    int result = first_pass("example");
     fclose(temp);
     
     printf("First pass result: %d (0=errors found, 1=success)\n", result);

@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     /* check if the number of arguments is correct */
     if (argc < TWO)
     {
-        report_error(0, Error_0);
+        report_error(0, Error_0);/*Not enough arguments in command*/
         return 1;
     }
     /* preprocess the files */

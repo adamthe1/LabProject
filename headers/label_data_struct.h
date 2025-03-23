@@ -1,6 +1,6 @@
 /**
  * @file mcro_table.h
- * @brief This file contains the  of structure and functions for handling the labels.
+ * @brief This file contains the of structure and functions for handling the labels.
  * @brief This file also store the binary code of all the data and code.
  */
 
@@ -11,7 +11,8 @@
  typedef struct Label{
      char* name;
      char type;
-     int line_index;
+     int is_entry;
+     int line_index;/*needs to be changed to IC/DC*/
      struct Label* next;
  } Label;
  
@@ -37,8 +38,12 @@
   * @brief This function frees the memory allocated for the labels list.
   * 
   */
+
+Label* get_label_head();
+
+int add_entry(char* label_name);
  
- void free_labels();
+void free_labels();
 
 typedef struct Data_binary{
     int binary;

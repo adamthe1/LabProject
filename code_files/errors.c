@@ -10,7 +10,6 @@ Error error_list[] = {
     {Error_4, "Error 4: Error: Memory allocation failed\n"},
     {Error_5, "Error 5: Reading text failed\n"},
     {Error_6, "Error 6: There is no macro name\n"},
-
     {Error_7, "Error 7: Label name already in label table"},
     {Error_8, "Error 8: Label name is too long\n"},
     {Error_9, "Error 9: Invalid label name\n"},
@@ -38,6 +37,7 @@ Error error_list[] = {
     {Error_31, "Error 31: Invalid operand\n"},
     {Error_32, "Error 32: Line after Label cannot be empty\n"},
     {Error_33, "Error 33: Unvalid macro name\n"},
+    {Error_34, "Error 34: Label name doesn't existe in the label table\n"},
 };
 
 void report_error(int line_num, int error_num){

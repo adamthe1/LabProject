@@ -3,6 +3,7 @@
 #include <string.h>
 #include "../headers/label_data_struct.h"
 #include "../headers/define.h"
+#include "../headers/errors.h"
 
 static Label* head = NULL;
 static Data_binary* data_head = NULL;
@@ -20,6 +21,7 @@ int create_label(char* name, char type, int line_index){
     new_label->name = name;
     new_label->line_index = line_index;
     new_label->type = type;
+    new_label->is_entry = 0;
     new_label->next = NULL;
 
     if(head == NULL){
@@ -51,6 +53,22 @@ Label* get_label(char* name){
     }
     return NULL;
 }
+
+Label* get_label_head(){
+    if(head){
+        return head;
+    }
+    return NULL;
+}
+
+int add_entry(char* label_name){
+    Label* temp = get_label(label_name);
+    if(!temp){
+        return 0; /*error - not a labael name*/
+    }
+    temp->is_entry = 1;
+}
+
 
 /**
  * @brief This function frees the memory allocated for the head list.
@@ -89,6 +107,8 @@ int create_binary_data(int binary, int DC_index){
     }
     return 1;
 }
+
+
 
 /**
  * @brief This function returns the data with the given line index.

@@ -8,6 +8,7 @@
 #include "../headers/errors.h"
 #include "../headers/helper.h"
 #include "../headers/analyze.h"
+#include "../headers/second_pass.h"
 
 /* Global variables */
 static char line[MAX_LINE_LENGTH + 1]; /* +1 for possible \n */
@@ -55,11 +56,11 @@ int first_pass(char* file_name) {
                 if (symbol_flag) {
                     /* Add label to symbol table as data */
                     if (get_label(label_name)){
-                        report_error(line_number, Error_7);
+                        report_error(line_number, Error_7);/*Label name already in label table*/
                         error_found = 1;
                     }
                     if (!create_label(copy_string(label_name), DATA_TYPE, DC)) {
-                        report_error(line_number, Error_21);
+                        report_error(line_number, Error_21);/*Failed to create data label*/
                         error_found = 1;
                     }
                 }
@@ -73,11 +74,11 @@ int first_pass(char* file_name) {
                     /* Add label to symbol table as data */
                     /* Must be unique - check if that name is already in label */
                     if (get_label(label_name)){
-                        report_error(line_number, Error_7);
+                        report_error(line_number, Error_7);/*Label name already in label table*/
                         error_found = 1;
                     }
                     if (!create_label(copy_string(label_name), DATA_TYPE, DC)) {
-                        report_error(line_number, Error_22);
+                        report_error(line_number, Error_22);/*Failed to create string label*/
                         error_found = 1;
                     }
                 }
@@ -100,11 +101,11 @@ int first_pass(char* file_name) {
                 if (symbol_flag) {
                     /* Add label to symbol table as code */
                     if (get_label(label_name)){
-                        report_error(line_number, Error_7);
+                        report_error(line_number, Error_7);/*Label name already in label table*/
                         error_found = 1;
                     }
                     if (!create_label(copy_string(label_name), CODE_TYPE, IC)) {
-                        report_error(line_number, Error_23);
+                        report_error(line_number, Error_23);/*Failed to create code label*/
                         error_found = 1;
                     }
                 }
@@ -115,7 +116,7 @@ int first_pass(char* file_name) {
                 break;
                 
             default:
-                report_error(line_number, Error_24);
+                report_error(line_number, Error_24);/*Unknown Instruction Type*/
                 error_found = 1;
         }
     }
@@ -123,12 +124,16 @@ int first_pass(char* file_name) {
     /* Update addresses for data labels to come after code */
     /* This would involve traversing your label table and updating addresses */
     if(!add_IC_to_DC(IC)){
-        report_error(line_number, Error_28);
+        report_error(line_number, Error_28);/*Failed to create binary code*/
         error_found = 1;
     }
     
     fclose(file);
-    return !error_found;
+    if(!error_found){
+        return second_pass(file_name,&IC,&DC);
+    }
+    printf("Errors were found during the first pass in the file, assembler  process can't be completed");
+    return 0;
 }
 
 int parse_label(char* line, char* label_name) {
@@ -146,7 +151,7 @@ int parse_label(char* line, char* label_name) {
     /* Extract the label name */
     label_len = colon_pos - line;
     if (label_len >= MAX_LABEL_LEN) {
-        report_error(line_number, Error_8);
+        report_error(line_number, Error_8);/*Label name is too long*/
         error_found = 1;
     }
     
@@ -155,7 +160,7 @@ int parse_label(char* line, char* label_name) {
     
     /* Validate label name */
     if (!is_valid_label_name(label_name)) {
-        report_error(line_number, Error_9);
+        report_error(line_number, Error_9);/*Invalid label name*/
         error_found = 1;
     }
     
@@ -174,6 +179,8 @@ int identify_instruction(char* line) {
     line = skip_whitespace(line);
     
     /* Check for directives */
+    /*TODO
+    change the strncmp because we need to check that the eord is not .datak for example*/
     if (*line == '.') {
         if (strncmp(line, ".data", 5) == 0) {
             return INST_TYPE_DATA;
@@ -201,7 +208,7 @@ int process_data_directive(char* line, int* DC) {
     /* Skip .data directive */
     pos = strstr(line, ".data");
     if (pos == NULL) {
-        report_error(line_number, Error_10);
+        report_error(line_number, Error_10);/*Missing .data directive*/
         return 0;
     }
     
@@ -210,13 +217,13 @@ int process_data_directive(char* line, int* DC) {
     
     /* Check for empty data directive */
     if (*pos == '\0') {
-        report_error(line_number, Error_11);
+        report_error(line_number, Error_11);/*Missing value in .data directive*/
         return 0;
     }
     
     /* Check for leading comma */
     if (*pos == ',') {
-        report_error(line_number, Error_11);
+        report_error(line_number, Error_11);/*Missing value in .data directive*/
         return 0;
     }
     
@@ -229,7 +236,7 @@ int process_data_directive(char* line, int* DC) {
         if (*pos == '\0') {
             /* If we found a trailing comma before */
             if (!has_found_value) {
-                report_error(line_number, Error_11); 
+                report_error(line_number, Error_11);/*Missing value in .data directive*/
                 return 0;
             }
             break;
@@ -237,7 +244,7 @@ int process_data_directive(char* line, int* DC) {
         
         /* Check for consecutive commas */
         if (*pos == ',') {
-            report_error(line_number, Error_11); 
+            report_error(line_number, Error_11);/*Missing value in .data directive*/
             return 0;
         }
         
@@ -251,7 +258,7 @@ int process_data_directive(char* line, int* DC) {
         
         /* Verify it's a digit */
         if (!isdigit((unsigned char)*pos)) {
-            report_error(line_number, Error_12); 
+            report_error(line_number, Error_12);/*Invalid value in .data directive*/
             return 0;
         }
         
@@ -262,7 +269,7 @@ int process_data_directive(char* line, int* DC) {
         
         /* Check if the number is followed by invalid characters */
         if (*pos != ',' && *pos != '\0' && *pos != '\n' && *pos != ';' && !isspace((unsigned char)*pos)) {
-            report_error(line_number, Error_12); /* Invalid character in number */
+            report_error(line_number, Error_12); /*Invalid value in .data directive (Invalid character in number) */
             return 0;
         }
         
@@ -274,7 +281,7 @@ int process_data_directive(char* line, int* DC) {
         
         /* Check for 12-bit range (-2048 to 2047) */
         if (temp_value < -2048 || temp_value > 2047) {
-            report_error(line_number, Error_13); 
+            report_error(line_number, Error_13);/*Number out of range*/
             return 0;
         }
         
@@ -295,7 +302,7 @@ int process_data_directive(char* line, int* DC) {
             pos++; /* Skip the comma */
             has_found_value = 0; /* Reset for next number */
         } else {
-            report_error(line_number, Error_12); /* Expected comma */
+            report_error(line_number, Error_12); /*Invalid value in .data directive (Expected comma) */
             return 0;
         }
     }
@@ -312,7 +319,7 @@ int process_string_directive(char* line, int* DC) {
     /* Skip .string directive */
     pos = strstr(line, ".string");
     if (pos == NULL) {
-        report_error(line_number, Error_13);
+        report_error(line_number, Error_13);/*Number out of range*/
         return 0;
     }
     pos += 7;  
@@ -320,13 +327,13 @@ int process_string_directive(char* line, int* DC) {
     
     /* Check for empty string directive */
     if (*pos == '\0') {
-        report_error(line_number, Error_25); 
+        report_error(line_number, Error_25);/*Empty string in .string*/
         return 0;
     }
     
-    /* Check for opening quote */
+    /* Check for opening quote*/
     if (*pos != '\"') {
-        report_error(line_number, Error_14);
+        report_error(line_number, Error_14);/*Syntax error in .string directive*/
         return 0;
     }
     
@@ -335,7 +342,7 @@ int process_string_directive(char* line, int* DC) {
     /* Find the closing quote */
     end_quote = strchr(start_quote + 1, '\"');
     if (end_quote == NULL) {
-        report_error(line_number, Error_14); /* Missing closing quote */
+        report_error(line_number, Error_14); /*Syntax error in .string directive (Missing closing quote)*/
         return 0;
     }
     
@@ -343,7 +350,7 @@ int process_string_directive(char* line, int* DC) {
     pos = end_quote + 1;
     pos = skip_whitespace(pos);
     if (*pos != '\0') {
-        report_error(line_number, Error_15); 
+        report_error(line_number, Error_15);/*Extranous text after command*/
         return 0;
     }
     
@@ -382,7 +389,7 @@ int process_extern_directive(char* line) {
     /* Skip .extern directive */
     pos = strstr(line, ".extern");
     if (pos == NULL) {
-        report_error(line_number, Error_16);
+        report_error(line_number, Error_16);/*Malformed .extern directive*/
         return 0;
     }
     pos += 7;  
@@ -390,7 +397,7 @@ int process_extern_directive(char* line) {
     
     /* Check for empty extern directive */
     if (*pos == '\0') {
-        report_error(line_number, Error_18);  
+        report_error(line_number, Error_18);/*Missing .extern directive*/ 
         return 0;
     }
     
@@ -399,7 +406,7 @@ int process_extern_directive(char* line) {
     
     /* Verify first character is a letter */
     if (!isalpha((unsigned char)*pos)) {
-        report_error(line_number, Error_9);
+        report_error(line_number, Error_9);/*Label name is too long*/
         return 0;
     }
     
@@ -413,13 +420,13 @@ int process_extern_directive(char* line) {
     /* Check for unexpected characters after the label */
     pos = skip_whitespace(pos);
     if (*pos != '\0') {
-        report_error(line_number, Error_15); 
+        report_error(line_number, Error_15);/*Extranous text after command*/
         return 0;
     }
     
     /* Check label length */
     if (label_end - label_start >= MAX_LABEL_LEN) {
-        report_error(line_number, Error_8); 
+        report_error(line_number, Error_8);/*Label name is too long*/
         return 0;
     }
     
@@ -431,7 +438,7 @@ int process_extern_directive(char* line) {
     
     /* Check if label name is valid */
     if (!is_valid_label_name(label_name)) {
-        report_error(line_number, Error_9); 
+        report_error(line_number, Error_9);/*Invalid label name*/
         return 0;
     }
     
@@ -440,7 +447,7 @@ int process_extern_directive(char* line) {
     existing = get_label(label_name); 
     if (existing != NULL) {
         if (existing->type != EXTERN_TYPE) {
-            report_error(line_number, Error_7);
+            report_error(line_number, Error_7);/*Label name already in label table*/
             return 0;
         }
         
@@ -453,18 +460,18 @@ int process_extern_directive(char* line) {
     label_copy = copy_string(label_name);
     
     if (label_copy == NULL) {
-        report_error(line_number, Error_19);
+        report_error(line_number, Error_19);/*Failed to create extern*/
         return 0;
     }
     
     flag = create_label(label_copy, EXTERN_TYPE, 0);
     if (!flag) {
         free(label_copy); 
-        report_error(line_number, Error_19);
+        report_error(line_number, Error_19);/*Failed to create extern*/
         return 0;
     }
     
-    
+
     return 1;
 }
 
@@ -502,7 +509,7 @@ int process_operation(char* line, int* IC) {
 
     /* Check if it's a known operation*/
     if (opcode == NULL) {
-        report_error(line_number, Error_20); \
+        report_error(line_number, Error_20);/*Failed to find operation*/
         return 0;
     }
     
@@ -520,7 +527,7 @@ int process_operation(char* line, int* IC) {
         operand_count++;
 
         if(!is_valid_operand(operand1)){
-            report_error(line_number, Error_29);
+            report_error(line_number, Error_29);/*Syntax error in operand 1*/
             return 0;
         }
         
@@ -538,7 +545,7 @@ int process_operation(char* line, int* IC) {
             operand_count++;
 
             if(!is_valid_operand(operand2)){
-                report_error(line_number, Error_30);
+                report_error(line_number, Error_30);/*Syntax error in operand 2*/
                 return 0;
             }
         }
@@ -546,7 +553,7 @@ int process_operation(char* line, int* IC) {
     
     /* check expected operand count */
     if (operand_count != opcode->operand_count) {
-        report_error(line_number, Error_26);
+        report_error(line_number, Error_26);/*Incorrect amount of operands*/
         return 0;
     }
     
@@ -554,12 +561,12 @@ int process_operation(char* line, int* IC) {
     if (operand_count > 0) {
         /* First operand (source) */
         if (!determine_addressing_mode(operand1, &source_addr_mode, &source_register)) {
-            report_error(line_number, Error_31); 
+            report_error(line_number, Error_31);/*Invalid operand*/
             return 0;
         }
 
         if (!is_valid_addressing_mode(opcode, source_addr_mode, operand_count == 2)) {
-            report_error(line_number, Error_27); 
+            report_error(line_number, Error_27);/*Invalid addressing mode*/
             return 0;
 
         }
@@ -571,12 +578,12 @@ int process_operation(char* line, int* IC) {
         /* Second operand (target) if present */
         if (operand_count > 1) {
             if (!determine_addressing_mode(operand2, &target_addr_mode, &target_register)) {
-                report_error(line_number, Error_31); 
+                report_error(line_number, Error_31);/*Invalid operand*/
                 return 0;
             }
 
             if (!is_valid_addressing_mode(opcode, target_addr_mode, 0)) {
-                report_error(line_number, Error_27); 
+                report_error(line_number, Error_27);/*Invalid addressing mode*/
                 return 0;
             }
 
@@ -598,7 +605,7 @@ int process_operation(char* line, int* IC) {
     
     /* Store the instruction word */
     if (!create_binary_code(instruction_word, *IC)) {
-        report_error(line_number, Error_28); 
+        report_error(line_number, Error_28);/*Failed to create binary code*/
         return 0;
     }
     
@@ -677,7 +684,7 @@ int encode_operand(char* operand, int addr_mode, int* IC) {
             value = strtol(operand + 1, NULL, 10); /* Skip the # */
 
             if (value < -1048576 || value > 1048575) {
-                report_error(line_number, Error_13); 
+                report_error(line_number, Error_13);/*Number out of range*/
                 return 0;
             }
             operand_word = ((int)value & 0x1FFFFF) << 3; /* 21-bit value */
@@ -721,7 +728,7 @@ int encode_operand(char* operand, int addr_mode, int* IC) {
     
     /* Store operand word */
     if (!create_binary_code(operand_word, *IC)) {
-        report_error(line_number, Error_28); 
+        report_error(line_number, Error_28);/*Failed to create binary code*/
         return 0;
     }
     
