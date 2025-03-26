@@ -51,8 +51,6 @@ int preprocess(char* file_name){
     size_t temp_code_used = 0;    /* Currently used bytes in temp_code */
     size_t new_size = 0;
     char *new_buffer;
-    /*str=the next line,str2=copy of str to use in strtok, temp=token of str2-the next word in the line,
-      temp_code=the code of the current mcro, code=the code to replace macro name, rest=extra chars in the declaration lines*/
     int mcro_flag = 0;
     /*mcro_flag=flag to know if the text is a macro code*/
 
@@ -91,7 +89,6 @@ int preprocess(char* file_name){
         }
         
         pos = skip_whitespace(line);
-
         /* Skip empty lines */
         if (pos[0] == '\0' || pos[0] == '\n') {
             if (!mcro_flag){
@@ -105,67 +102,87 @@ int preprocess(char* file_name){
             first_thing[i++] = *pos++;
         }
         first_thing[i] = '\0'; 
-
         if(get_macro(first_thing)){/*if temp is a macro name which was declared before*/
             code = get_macro_code(first_thing);
             fprintf(fp2, "%s", code);/*prints the macro code instead of its name*/
             continue;
         }
-
         pos = skip_whitespace(line);
 
         /*step3*/
-        if (strncmp(pos, "mcro ", 5) == 0){/*A start of macro declaration*/
-            
-            pos += 5;
-            pos = skip_whitespace(pos);
-            
-            i = 0;
-            while (pos[0] != '\0' && !isspace((unsigned char)pos[0]) && i < MAX_MCRO_LENGTH-1 && pos[0] != '\n') {
-                mcro_name[i++] = *pos++;
+        if ((pos = strstr(line,"mcro"))){/*A start of macro declaration*/
+        
+            if ((pos>line && !isspace(*(pos-1))) || (*(pos+4) != '\0' && !isspace(*(pos+4)))){
+                    ;/*not a macro declaration - regular line*/
             }
-            mcro_name[i] = '\0'; 
-
-            pos = skip_whitespace(pos);
-            if (*pos != '\n' && *pos != '\0'){
-                printf("%c\n", *pos);
-                report_error(linecount, Error_2);/*Extra chars in macro declaration line*/
-                error_found = 1;
-            }
-
-            if(strlen(mcro_name) == 0){
-                report_error(linecount,Error_6);/*There is no macro name*/
-                error_found = 1;
-            }
-
-            if(!valid_macro_dec(mcro_name)){
-                report_error(linecount,Error_33);/*Unvalid macro name*/
-                error_found = 1;
+            else{
+                if(strcmp(first_thing,"mcro")){
+                    report_error(linecount, Error_2);/*Extra chars in macro declaration line*/
+                    error_found = 1;
+                    continue;
+                }
+    
+                pos += 5;
+                pos = skip_whitespace(pos);
+                
+                i = 0;
+                while (pos[0] != '\0' && !isspace((unsigned char)pos[0]) && i < MAX_MCRO_LENGTH-1 && pos[0] != '\n') {
+                    mcro_name[i++] = *pos++;
+                }
+                mcro_name[i] = '\0'; 
+    
+                pos = skip_whitespace(pos);
+                if (*pos != '\n' && *pos != '\0'){
+                    report_error(linecount, Error_2);/*Extra chars in macro declaration line*/
+                    error_found = 1;
+                }
+    
+                if(strlen(mcro_name) == 0){
+                    report_error(linecount,Error_6);/*There is no macro name*/
+                    error_found = 1;
+                }
+    
+                if(!valid_macro_dec(mcro_name)){
+                    report_error(linecount,Error_33);/*Unvalid macro name*/
+                    error_found = 1;
+                    continue;
+                }
+    
+                mcro_flag = 1;/*macro declaration*/
+                create_macro(mcro_name, linecount);/*create a macro with the name temp*/
+                temp_code[0] = '\0';
+                temp_code_used = 0;
                 continue;
             }
-
-            mcro_flag = 1;/*macro declaration*/
-            create_macro(mcro_name, linecount);/*create a macro with the name temp*/
-            temp_code[0] = '\0';
-            temp_code_used = 0;
-            continue;
+            
         }
         
         if (mcro_flag){
-            if (strncmp(pos, "mcroend", 7) == 0){/*A start of macro declaration*/
 
-                pos += 7;
-                pos = skip_whitespace(pos);
-                
-                if (*pos != '\n' && *pos != '\0'){
-                    report_error(linecount,Error_3); /* Invalid macroend declaration*/
-                    error_found = 1;
+            if ((pos = strstr(line,"mcroend"))){/*A start of macro declaration*/
+                if((pos>line && !isspace(*(pos-1))) || (*(pos+7) != '\0' && !isspace(*(pos+7)))){
+                    ;/*not a macroend declaration - part of the macro*/
                 }
+                else{
+                    if(strcmp(first_thing,"mcroend")){
+                        report_error(linecount, Error_3);/* Invalid macroend declaration*/
+                        error_found = 1;
+                    }
+        
+                    pos += 7;
+                    pos = skip_whitespace(pos);
+                    
+                    if (*pos != '\n' && *pos != '\0'){
+                        report_error(linecount,Error_3); /* Invalid macroend declaration*/
+                        error_found = 1;
+                    }
 
-                add_code_to_macro(temp_code);/*adds the whole macro code to the macro*/
-                temp_code[0] = '\0';/*initilazes the temp_code*/
-                mcro_flag = 0;/*macro declaration has ended*/
-                continue;
+                    mcro_flag = 0;/*macro declaration has ended*/
+                    add_code_to_macro(temp_code);/*adds the whole macro code to the macro*/
+                    temp_code[0] = '\0';/*initilazes the temp_code*/
+                    continue;
+                }
+                
             }
             line_len = strlen(line);
             if (temp_code_used + line_len + 1 > temp_code_size) {

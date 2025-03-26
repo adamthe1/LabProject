@@ -22,7 +22,7 @@ int preprocess(char* file_name);
  */
 int valid_macro_dec(char* mcro_name);
 char* next_word(char* line, int*);
-int look_for_word(char* line, char* word, int* counter);
+int look_for_word(char* line, char* word);
 
 
 #endif
