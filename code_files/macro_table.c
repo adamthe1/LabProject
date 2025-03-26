@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../headers/macro_table.h"
+#include "../headers/helper.h"
 
 static Macro* head = NULL;
 
@@ -13,7 +14,7 @@ int create_macro(char* name, int line_index){
         return 0;
     }
 
-    new_macro->name = name;
+    new_macro->name = copy_string(name);
     new_macro->line_index = line_index;
     new_macro->code = NULL;
     new_macro->next = NULL;
@@ -94,7 +95,33 @@ void free_macros(){
     Macro* next;
     while(current != NULL){
         next = current->next;
+        free(current->name);
+        free(current->code);
         free(current);
         current = next;
+    }
+}
+
+/**
+ * @brief This function prints all macros in the list.
+ * 
+ */
+void print_macros() {
+    Macro* current = head;
+    
+    if (head == NULL) {
+        printf("No macros defined.\n");
+        return;
+    }
+    
+    printf("Macro Table:\n");
+    printf("------------\n");
+    
+    while (current != NULL) {
+        printf("Name: %s\n", current->name);
+        printf("Line: %d\n", current->line_index);
+        printf("Code: %s\n", current->code ? current->code : "No code defined");
+        printf("------------\n");
+        current = current->next;
     }
 }

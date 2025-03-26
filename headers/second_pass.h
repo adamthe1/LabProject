@@ -7,22 +7,11 @@
 int second_pass(char* file_name, int* IC, int* DC);
 
 /**
- * @brief Processes an assembly operation (MOV, CMP, ADD, etc.)
+ * @brief This function processes the unknown labels in the unknown label table
  * 
- * @param line - The operation line
- * @param IC - Current instruction counter (updated by function)
- * @return int - 1 if successful, 0 if error
+ * @param external_file - the name of the external file.
+ * @return int - returns 1 if the process has finished successfuly and 0 if it hasn't.
  */
-int process_operation2(char* line, int* IC);
-
-/**
- * @brief Encodes an operand into binary form
- * 
- * @param operand - The operand to encode
- * @param addr_mode - The addressing mode of the operand
- * @param IC - Current instruction counter (updated by function)
- * @return int - 1 if successful, 0 if error
- */
-int encode_operand2(char* operand, int addr_mode);
+int process_unknown(char* external_file);
 
 #endif /* _SECOND_PASS_H */

@@ -11,7 +11,7 @@
 #include "../headers/second_pass.h"
 
 /* Global variables */
-static char line[MAX_LINE_LENGTH + 2]; /* +1 for possible \n */
+static char line[MAX_LINE_LENGTH + 1]; /* +1 for possible \n */
 static int line_number = 0;
 static int error_found = 0;
 
@@ -33,14 +33,18 @@ int first_pass(char* file_name) {
     rewind(file);
     
     while (fgets(line, sizeof(line), file)) {
-        /* If the line len is larger than 81 error */
-        if (strlen(line) > 81) {
-            report_error(line_number, Error_35);
-        }
+
         line_number++;
+
         /* Remove newline character if present */
         pos = strchr(line, '\n');
         if (pos) *pos = '\0';
+
+        /* If the line len is larger than 80 without \n error */
+        if (strlen(line) > 80) {
+            report_error(line_number, Error_35);
+        }
+        
         
         /* Skip empty lines and comments */
         pos = skip_whitespace(line);
@@ -63,7 +67,8 @@ int first_pass(char* file_name) {
                         report_error(line_number, Error_7);/*Label name already in label table*/
                         error_found = 1;
                     }
-                    if (!create_label(copy_string(label_name), DATA_TYPE, DC)) {
+
+                    if (!create_label(label_name, DATA_TYPE, DC)) {
                         report_error(line_number, Error_21);/*Failed to create data label*/
                         error_found = 1;
                     }
@@ -81,7 +86,7 @@ int first_pass(char* file_name) {
                         report_error(line_number, Error_7);/*Label name already in label table*/
                         error_found = 1;
                     }
-                    if (!create_label(copy_string(label_name), DATA_TYPE, DC)) {
+                    if (!create_label(label_name, DATA_TYPE, DC)) {
                         report_error(line_number, Error_22);/*Failed to create string label*/
                         error_found = 1;
                     }
@@ -108,7 +113,7 @@ int first_pass(char* file_name) {
                         report_error(line_number, Error_7);/*Label name already in label table*/
                         error_found = 1;
                     }
-                    if (!create_label(copy_string(label_name), CODE_TYPE, IC)) {
+                    if (!create_label(label_name, CODE_TYPE, IC)) {
                         report_error(line_number, Error_23);/*Failed to create code label*/
                         error_found = 1;
                     }
@@ -387,7 +392,6 @@ int process_extern_directive(char* line) {
     char label_name[MAX_LABEL_LEN];
     char temp_char;
     Label* existing;
-    char* label_copy;
     int flag;
     
     /* Skip .extern directive */
@@ -459,18 +463,9 @@ int process_extern_directive(char* line) {
         return 1;
     }
 
-
-    /* Add to label table as external */
-    label_copy = copy_string(label_name);
     
-    if (label_copy == NULL) {
-        report_error(line_number, Error_19);/*Failed to create extern*/
-        return 0;
-    }
-    
-    flag = create_label(label_copy, EXTERN_TYPE, 0);
+    flag = create_label(label_name, EXTERN_TYPE, 0);
     if (!flag) {
-        free(label_copy); 
         report_error(line_number, Error_19);/*Failed to create extern*/
         return 0;
     }
@@ -697,7 +692,7 @@ int encode_operand(char* operand, int addr_mode, int* IC) {
             
         case ADDR_MODE_DIRECT:
             /* Direct addressing: 21 bits for address, ARE = 010 (relocatable) or 100 (external) */
-            label = copy_string(operand);
+            label = operand;
             label_entry = get_label(label);
             
             if (label_entry == NULL) {
@@ -720,8 +715,7 @@ int encode_operand(char* operand, int addr_mode, int* IC) {
             
         case ADDR_MODE_RELATIVE:
             /* Relative addressing: 21 bits for offset, ARE = 001 (absolute) */
-            label = copy_string(operand); /* Skip the & */
-            label += 1;
+            label = operand + 1; /* Skip the & */
             label_entry = get_label(label);
             
             if (label_entry == NULL) {
@@ -739,6 +733,7 @@ int encode_operand(char* operand, int addr_mode, int* IC) {
                 report_error(line_number, Error_28);/*Failed to create binary code*/
                 return 0;
             }
+
             break;
             
         default:

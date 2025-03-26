@@ -4,6 +4,7 @@
 #include "../headers/label_data_struct.h"
 #include "../headers/define.h"
 #include "../headers/errors.h"
+#include "../headers/helper.h"
 
 static Label* head = NULL;
 static Data_binary* data_head = NULL;
@@ -19,7 +20,7 @@ int create_label(char* name, char type, int line_index){
         return 0;
     }
 
-    new_label->name = name;
+    new_label->name = copy_string(name);
     new_label->line_index = line_index;
     new_label->type = type;
     new_label->is_entry = 0;
@@ -82,6 +83,7 @@ void free_labels(){
     Label* next;
     while(current != NULL){
         next = current->next;
+        free(current->name);
         free(current);
         current = next;
     }
@@ -184,11 +186,11 @@ int create_binary_code(int binary, int IC_index){
     return 1;
 }
 
-Data_binary* get_binary_code(int IC_index){
+Code_binary* get_binary_code(int IC_index){
     Code_binary* current = code_head;
     while(current != NULL){
         if(current->IC_index == IC_index){
-            return (Data_binary*)current;
+            return (Code_binary*)current;
         }
         current = current->next;
     }
@@ -212,7 +214,7 @@ int create_unknown_label(char* name, int IC_index, int type, int line_number){
         return 0;
     }
 
-    new_label->name = name;
+    new_label->name = copy_string(name);
     new_label->IC_index = IC_index;
     new_label->type = type;
     new_label->line_number = line_number;
@@ -246,6 +248,7 @@ void free_unknown_labels() {
     Unknown_label* next;
     while(current != NULL) {
         next = current->next;
+        free(current->name);
         free(current);
         current = next;
     }

@@ -4,6 +4,8 @@
 #include <ctype.h>
 #include "../headers/helper.h"
 #include "../headers/define.h"
+#include "../headers/label_data_struct.h"
+#include "../headers/macro_table.h"
 
 char* reg[8] = {"r0","r1","r2","r3","r4","r5","r6","r7"};
 
@@ -67,11 +69,11 @@ int get_reg(char* name){
 }
 
 char* get_file_name(char* file_name){
-    char* name = (char*)malloc(strlen(file_name) + 1);
+    char* name = add_suffix(file_name, ".as");
     if(name == NULL){
         return NULL;
     }
-    name = add_suffix(file_name, ".as");
+    
     return name;
 }
 
@@ -289,4 +291,16 @@ void trim_whitespace(char* str) {
     while (len > 0 && isspace((unsigned char)str[len-1])) {
         str[--len] = '\0';
     }
+}
+
+
+void free_all(){
+    /* Free label-related data structures */
+    free_labels();
+    free_binary_data();
+    free_binary_code();
+    free_unknown_labels();
+    
+    /* Free macro table */
+    free_macros();
 }

@@ -8,6 +8,7 @@
 #include "../headers/pre_assemble.h"
 #include "../headers/first_pass.h"
 #include "../headers/label_data_struct.h"
+#include "../headers/macro_table.h"
 
 /**
  * @brief The main function of the assembler program.
@@ -20,6 +21,7 @@ int main(int argc, char *argv[])
 {
     int i = 1;
     char *file_name;
+    char *am_file_name;
     FILE* file;
     /* check if the number of arguments is correct */
     if (argc < TWO)
@@ -39,20 +41,30 @@ int main(int argc, char *argv[])
         file = look_for_file(file_name);
         if (file == NULL)
             continue;
+        fclose(file);
         
         printf("Starting preprocessing - %s\n",file_name);
-        if (preprocess(file_name) == 0)
+        if (preprocess(file_name) == 0){
+            free_macros();
             continue;
+        }
 
         printf("Preprocessing finished\n");
         
-        /*file_name = change_suffix(file_name, ".am");
+        am_file_name = change_suffix(file_name, ".am");
         
-        printf("Starting first pass on %s\n", file_name);
-        if (first_pass(file_name) == 0)
+        printf("Starting first pass on %s\n", am_file_name);
+        if (first_pass(am_file_name) == 0){
+            free_all();
             continue;
+        }
+
         printf("First pass finished\n");
-        print_label_table();*/
+        free_all();
+        free(am_file_name);
+        free(file_name); 
+        
     }
+    
     return 0;
 }

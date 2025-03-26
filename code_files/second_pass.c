@@ -35,22 +35,24 @@ static int line_number = 0;
 static int error_found = 0;
 
 int second_pass(char* file_name ,int* IC, int* DC){
-    int symbol_flag = 0;
     char label_name[MAX_LABEL_LEN];
     int inst_type, i;
     char* pos;
     char* colon_pos;
     char* label_end;
-    FILE* file, *fp_ob,*fp_ext,*fp_ent;
+    char* ob_name, *ent_name, *ext_name;
+    FILE* file, *fp_ob,*fp_ent;
     Label* current;
-    Unknown_label *current_unknown;
-    
-    fp_ob = fopen(change_suffix(file_name,".ob"), "w");/*add .ob to the file name*/
+    ob_name = change_suffix(file_name, ".ob");
+    ent_name = change_suffix(file_name, ".ent");
+    ext_name = change_suffix(file_name, ".ext");
+
+    fp_ob = fopen(ob_name, "w");/*add .ob to the file name*/
     if (!fp_ob) {
         report_error(line_number,Error_1);/*can't open file*/
         return 0;
     }
-    fp_ent = fopen(change_suffix(file_name,".ent"), "w");/*add .ent to the file name*/
+    fp_ent = fopen(ent_name, "w");/*add .ent to the file name*/
     if (!fp_ent) {
         report_error(line_number,Error_1);/*can't open file*/
         return 0;
@@ -83,7 +85,7 @@ int second_pass(char* file_name ,int* IC, int* DC){
         colon_pos = strchr(pos, ':');
         if (colon_pos != NULL) {
             label_end = colon_pos + 1;
-            strcpy(pos, label_end);  
+            memmove(pos, label_end, strlen(label_end) + 1);
         }
         pos = skip_whitespace(pos);
 
@@ -112,7 +114,6 @@ int second_pass(char* file_name ,int* IC, int* DC){
             label_name[i] = '\0';
 
             if (!is_valid_label_name(label_name)) {
-                printf("Error: Invalid label name %s\n", label_name);
                 report_error(line_number,Error_9);/*Invalid label name*/
                 error_found = 1;
                 continue;
@@ -133,9 +134,10 @@ int second_pass(char* file_name ,int* IC, int* DC){
     }
     
 
-    if (!process_unknown(change_suffix(file_name,".ext"))){
+    if (!process_unknown(ext_name)){
         error_found = 1;
     }
+    if (1);
     
     
     /*step 7*/
@@ -144,12 +146,14 @@ int second_pass(char* file_name ,int* IC, int* DC){
     if(error_found){/*if there is at least 1 error in the file found in the second pass*/
         printf("Errors were found during the second pass in the file, assembler  process can't be completed\n");
         /* delete all files*/
-        remove(change_suffix(file_name,".ob"));
-        remove(change_suffix(file_name,".ext"));
-        remove(change_suffix(file_name,".ent"));
+        remove(ob_name);
+        remove(ext_name);
+        remove(ent_name);
+        free(ob_name);
+        free(ext_name);
+        free(ent_name);
         fclose(fp_ob);
         fclose(fp_ent);
-        fclose(fp_ext);
         return 0;
     }
     /*step 8 - bulid the output files*/
@@ -161,7 +165,6 @@ int second_pass(char* file_name ,int* IC, int* DC){
         fprintf(fp_ob,"%07d 0x%06X\n", i, get_binary_code(i)->binary & 0xFFFFFF);
 
     }
-    printf("IC: %d, DC: %d\n",*IC, *DC);
     for (i = *IC; i < *DC; i++) {
         fprintf(fp_ob,"%07d 0x%06X\n", i, get_binary_data(i)->binary & 0xFFFFFF);
     }
@@ -177,6 +180,9 @@ int second_pass(char* file_name ,int* IC, int* DC){
     
     fclose(fp_ob);
     fclose(fp_ent);
+    free(ent_name);
+    free(ext_name);
+    free(ob_name);
     
     return 1;
 }
@@ -189,7 +195,6 @@ int process_unknown(char* external_file){
     FILE* fp_ext = fopen(external_file, "w");
     while(current != NULL){
         if(current->type == UKNOWN_LABEL_DIRECT){
-            printf("current->name: %s\n",current->name);
             label = get_label(current->name);
             if (label == NULL) {
                 report_error(current->line_number, Error_34);/*Label name doesn't exist in the label table*/
@@ -207,7 +212,6 @@ int process_unknown(char* external_file){
                 }
                 code->binary = 0; /* External address */
                 code->binary |= 4; /* ARE = 100 (external) */
-                printf("extern: current->name: %s, current->IC_index: %d\n",current->name,current->IC_index);
                 fprintf(fp_ext, "%s %07d\n", current->name, current->IC_index);
             } else {
                 code = get_binary_code(current->IC_index);

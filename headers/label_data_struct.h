@@ -97,10 +97,10 @@ int create_binary_code(int binary, int IC_index);
  * @brief This function returns the data with the given IC index.
  * 
  * @param line_index - the index of the line in the file.
- * @return Data_binary* - the data.
+ * @return Code_binary* - the data.
  */
 
-Data_binary* get_binary_code(int IC_index);
+Code_binary* get_binary_code(int IC_index);
 
 /**
  * @brief This function frees the memory allocated for the data list.

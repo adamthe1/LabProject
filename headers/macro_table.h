@@ -54,4 +54,6 @@ Macro* get_macro(char* name);
 
 void free_macros();
 
+void print_macros();
+
 #endif

@@ -6,7 +6,7 @@ Error error_list[] = {
     {Error_0, "Error 0: Not enough arguments in command\n"},
     {Error_1, "Error 1: Can't open file\n"},
     {Error_2, "Error 2: Extra chars in macro declaration line\n"},
-    {Error_3, "Error 3: Unvalid macroend declaration\n"},
+    {Error_3, "Error 3: Invalid macroend declaration\n"},
     {Error_4, "Error 4: Error: Memory allocation failed\n"},
     {Error_5, "Error 5: Reading text failed\n"},
     {Error_6, "Error 6: There is no macro name\n"},
@@ -41,6 +41,7 @@ Error error_list[] = {
     {Error_35, "Error 35: Line too long (over 81 char)"},
     {Error_36, "Error 36: External label in relative addressing mode\n"},
     {Error_37, "Error 37: No binary code with that IC\n"},
+    {Error_38, "Error 38: unclosed macro definition"}
 };
 
 void report_error(int line_num, int error_num){

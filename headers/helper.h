@@ -135,5 +135,10 @@ int dec_to_binary(int num, int* binary);
  */
  void trim_whitespace(char* s);
 
+ /**
+  * @brief free every table in the project
+  */
+
+void free_all();
 
 #endif /* HELPER_H */
