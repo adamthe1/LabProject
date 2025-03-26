@@ -32,15 +32,17 @@ otherwise, return to 6.
  */
 
 int preprocess(char* file_name){
-    
     FILE *fp, *fp2;
     /*fp=as file pointer, fp2=am file pointer*/
-    char* str,*str2, *temp, *temp_code, *code, *rest;
+    char* str,*str2, *temp, *temp_code = NULL, *code;
     /*str=the next line,str2=copy of str to use in strtok, temp=token of str2-the next word in the line,
       temp_code=the code of the current mcro, code=the code to replace macro name, rest=extra chars in the declaration lines*/
     int mcro_flag = 0, linecount = 0;
     /*mcro_flag=flag to know if the text is a macro code*/
-
+    int word_counter = 0;
+    int char_to_advance = 0;
+    char* pos;
+    
     fp = fopen(file_name, "r+");
     if (!fp) {
         report_error(linecount,Error_1);/*can't open file*/
@@ -51,80 +53,62 @@ int preprocess(char* file_name){
         report_error(linecount,Error_1);/*can't open file*/
         return 0;
     }
-    
+    str = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
+    if (!str) {
+        report_error(linecount,Error_4);/*Memory allocation failed*/
+        return 0;
+    }
+
+    temp = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
+    if (!temp){
+        report_error(linecount,Error_4);/*Memory allocation failed*/
+        free(str);
+        return 0;
+    }
+
+    temp_code = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
+    if (!temp_code) {
+        report_error(linecount,Error_4);/*Memory allocation failed*/
+        free(str);
+        free(temp);
+        return 0;
+    }
+
+    temp_code[0] = '\0';/* Initialize as empty string */
     /*the loop ends when the file ends*/
-    while (!feof(fp)) {
-        str = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
-        if (!str) {
-            report_error(linecount,Error_4);/*Memory allocation failed*/
-            return 0;
-        }
-        /*reads the next line into str*/
-        if (!fgets(str, MAX_LINE_LENGTH, fp)){
-            if (feof(fp)) {/*End of file*/
-                ;
-            } else {
-                report_error(linecount, Error_5); /* Reading text failed */
-            }
-            free(str);
-            break;
-        }
-        
-        temp = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
-        if (!temp){
-            report_error(linecount,Error_4);/*Memory allocation failed*/
-            free(str);
-            return 0;
-        }
-
-        str2 = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
-        if (!str2){
-            report_error(linecount,Error_4);/*Memory allocation failed*/
-            free(str);
-            free(temp);
-            return 0;
-        }
-
-        if (temp_code == NULL || strlen(temp_code) == 0){
-            temp_code = (char*) malloc(MAX_LINE_LENGTH * sizeof(char));
-            if (!temp_code) {
-                report_error(linecount,Error_4);/*Memory allocation failed*/
-                free(str);
-                free(temp);
-                free(str2);
-                return 0;
-            }
-            temp_code[0] = '\0';/* Initialize as empty string */
-        }
-
+    while (fgets(str, MAX_LINE_LENGTH, fp)) {/*reads the next line into str*/
+        str2 = str;
+        printf("line = %s\n", str);
         linecount++;
-        strcpy(str2,str);/*copy str into str2 to use strtok without changing str*/
-        extra_spaces(str2);/*remove extra spaces from str2 to make the checks easier*/
+        pos = skip_whitespace(str);
+        if (*pos == '\0') {/*Skip empty lines*/
+            continue;
+        }
+        printf("skip line okay\n");
         /*step2*/
-        temp = strtok(str2, " ");/*temp = the first word*/
-
+        temp = next_word(str2, &char_to_advance);
         if(!temp){/*if the line is empty*/
             continue;
         }
-
         if(get_macro(temp)){/*if temp is a macro name which was declared before*/
             code = get_macro_code(temp);
-            printf("%s",code);
+            printf("macro = %s\nmacro code = %s",temp,code);
             fprintf(fp2,"%s",code);/*prints the macro code instead of its name*/
             continue;
         }
         /*step3*/
-        if(!strcmp(temp,"mcro")){/*A start of macro declaration*/
-            temp = strtok(NULL, " ");/*macro name*/
-            rest = strtok(NULL," ");/*the rest of the line*/
-            if(rest){
+        if(look_for_word(str2,"mcro",&word_counter)){/*A start of macro declaration*/
+            if(word_counter == -1 || word_counter > 2){
                 report_error(linecount,Error_2);/*Extra chars in macro declaration line*/
                 return 0;
             }
-            if(!temp){
+            if(word_counter == 1){
                 report_error(linecount,Error_6);/*There is no macro name*/
                 return 0;
             }
+            str2 += char_to_advance;
+            temp = next_word(str2,&char_to_advance);
+            printf("macro name = %s\n", temp);
             if(!valid_macro_dec(temp)){
                 report_error(linecount,Error_33);/*Unvalid macro name*/
                 return 0;
@@ -133,11 +117,9 @@ int preprocess(char* file_name){
             create_macro(temp, linecount);/*create a macro with the name temp*/
             continue;
         }
-        
         if (mcro_flag==1){
-            if(!strcmp(temp,"mcroend")){/*if the macro code has ended*/
-                rest = strtok(NULL," ");
-                if(rest){/*checks that there are no extra chars in the line of the macroend declaration*/
+            if(look_for_word(str,"mcroend",&word_counter)){/*if the macro code has ended*/
+                if(word_counter == -1 || word_counter > 1){/*checks that there are no extra chars in the line of the macroend declaration*/
                     report_error(linecount,Error_3);/*Unvalid macroend declaration*/
                     return 0;
                 }
@@ -149,14 +131,17 @@ int preprocess(char* file_name){
             strcat(temp_code,str);/*adds the current line to the temp_code*/
             continue;
         }
-            fprintf(fp2,"%s",str);/*prints regular lines only in the am file*/
+        
+        fprintf(fp2,"%s",str);/*prints regular lines only in the am file*/
     }
+
+    printf("end of function");
     free(str);
     free(temp);
     free(temp_code);
     fclose(fp);
     fclose(fp2);
-     return 1;   
+    return 1;   
 }
 
 
@@ -181,4 +166,60 @@ int valid_macro_dec(char *mcro_name)
        return 0; 
     }   
     return 1;
+}
+
+char* next_word(char* line, int* char_counter){
+    char* word;
+
+    word = (char*)malloc(MAX_LINE_LENGTH * sizeof(char));
+    if (!word) {
+        printf("Memory allocation failed\n");
+        return NULL;
+    }
+
+    *char_counter = 0;
+
+    line = skip_whitespace(line);
+    if((*line) == '\0'){
+        free(word);
+        return NULL;
+    }
+    while((line)[*char_counter] !='\0' && !isspace((line)[*char_counter])){
+        (*char_counter)++;
+    }
+    
+    strncpy(word,line,*char_counter);
+    word[*char_counter] = '\0';
+    return word; 
+    
+}
+
+int look_for_word(char* line, char* word, int* word_counter){
+    /*assums that the line is not empty*/
+    int found_word = 0;
+    int char_to_advance = 0;
+    char* copy_line;
+    char* current_word;
+    copy_line = line;
+    current_word = next_word(copy_line, &char_to_advance);
+    copy_line += char_to_advance+1;
+    (*word_counter) = 0;
+
+    while (current_word && strlen(current_word) > 0)
+    {
+        if(!strcmp(word, current_word)){
+            if(*word_counter>0){
+                *word_counter = -1;
+                return 1;
+             }
+            found_word = 1;
+        }
+        (*word_counter)++;
+        free(current_word);
+        current_word = next_word(copy_line, &char_to_advance);
+        copy_line += char_to_advance+1;
+    }
+    
+    return found_word;
+    
 }

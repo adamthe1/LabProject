@@ -39,20 +39,20 @@ int main(int argc, char *argv[])
         file = look_for_file(file_name);
         if (file == NULL)
             continue;
-        /*
-        printf("Starting preprocessing\n");
+        
+        printf("Starting preprocessing - %s\n",file_name);
         if (preprocess(file_name) == 0)
             continue;
 
         printf("Preprocessing finished\n");
-        */
-        file_name = change_suffix(file_name, ".am");
+        
+        /*file_name = change_suffix(file_name, ".am");
         
         printf("Starting first pass on %s\n", file_name);
         if (first_pass(file_name) == 0)
             continue;
         printf("First pass finished\n");
-        print_label_table();
+        print_label_table();*/
     }
     return 0;
 }

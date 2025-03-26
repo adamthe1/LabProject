@@ -205,4 +205,4 @@ textFive:   .string "Ending sequence with this string."
 .extern finalRoutine
 
 endPoint:   stop
-             prn r7
+             prn r7  
