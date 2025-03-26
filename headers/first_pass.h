@@ -80,7 +80,7 @@ int process_operation(char* line, int* IC);
  * @param IC - Current instruction counter (updated by function)
  * @return int - 1 if successful, 0 if error
  */
-int encode_operand(char* operand, int addr_mode, int* IC);
+int encode_operand(char* operand, int addr_mode, int* IC, int command_IC);
 
 /**
  * @brief Determines the addressing mode and register number of an operand

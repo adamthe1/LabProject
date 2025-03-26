@@ -123,6 +123,7 @@ typedef struct Unknown_label{
     int IC_index;
     int type;
     int line_number;
+    int command_IC;
     struct Unknown_label* next;
 } Unknown_label;
 
@@ -135,7 +136,7 @@ typedef struct Unknown_label{
  * @return int - 1 if the data was created successfully, 0 otherwise.
  */
 
-int create_unknown_label(char* name, int IC_index, int type, int line_number);
+int create_unknown_label(char* name, int IC_index, int type, int line_number, int command_IC);
 
 /**
  * @brief This function returns the unknown label with the given name.

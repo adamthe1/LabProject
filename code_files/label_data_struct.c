@@ -207,7 +207,7 @@ void free_binary_code(){
     }
 }
 
-int create_unknown_label(char* name, int IC_index, int type, int line_number){
+int create_unknown_label(char* name, int IC_index, int type, int line_number, int command_IC){
     Unknown_label* new_label = (Unknown_label*)malloc(sizeof(Unknown_label));
 
     if(new_label == NULL) {
@@ -219,6 +219,7 @@ int create_unknown_label(char* name, int IC_index, int type, int line_number){
     new_label->type = type;
     new_label->line_number = line_number;
     new_label->next = NULL;
+    new_label->command_IC = command_IC;
 
     if(unknown_head == NULL) {
         unknown_head = new_label;

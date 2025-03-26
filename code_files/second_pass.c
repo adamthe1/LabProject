@@ -211,7 +211,7 @@ int process_unknown(char* external_file){
                     continue;
                 }
                 code->binary = 0; /* External address */
-                code->binary |= 4; /* ARE = 100 (external) */
+                code->binary |= 1; /* ARE = 001 (external) */
                 fprintf(fp_ext, "%s %07d\n", current->name, current->IC_index);
             } else {
                 code = get_binary_code(current->IC_index);
@@ -247,9 +247,10 @@ int process_unknown(char* external_file){
                 continue;
             } 
             else {
-            code->binary = current->IC_index - label->line_index;
-            code->binary <<= 3; /* 21-bit offset */
-            code->binary |= 1; /* ARE = 001 (absolute) */
+                printf("label->line_index: %d, label name: %s, current->IC_index: %d, current name: %s\n", label->line_index, label->name, current->IC_index, current->name);
+                code->binary = label->line_index - current->command_IC;
+                code->binary <<= 3; /* 21-bit offset */
+                code->binary |= 4; /* ARE = 100 (absolute) */
             }
         }
         current = current->next;

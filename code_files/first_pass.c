@@ -9,6 +9,7 @@
 #include "../headers/helper.h"
 #include "../headers/analyze.h"
 #include "../headers/second_pass.h"
+#include "../headers/macro_table.h"
 
 /* Global variables */
 static char line[MAX_LINE_LENGTH + 1]; /* +1 for possible \n */
@@ -63,7 +64,7 @@ int first_pass(char* file_name) {
             case INST_TYPE_DATA:
                 if (symbol_flag) {
                     /* Add label to symbol table as data */
-                    if (get_label(label_name)){
+                    if (get_label(label_name) || get_macro(label_name)){
                         report_error(line_number, Error_7);/*Label name already in label table*/
                         error_found = 1;
                     }
@@ -82,7 +83,7 @@ int first_pass(char* file_name) {
                 if (symbol_flag) {
                     /* Add label to symbol table as data */
                     /* Must be unique - check if that name is already in label */
-                    if (get_label(label_name)){
+                    if (get_label(label_name) || get_macro(label_name)){
                         report_error(line_number, Error_7);/*Label name already in label table*/
                         error_found = 1;
                     }
@@ -109,7 +110,7 @@ int first_pass(char* file_name) {
             case INST_TYPE_OPERATION:
                 if (symbol_flag) {
                     /* Add label to symbol table as code */
-                    if (get_label(label_name)){
+                    if (get_label(label_name) || get_macro(label_name)){
                         report_error(line_number, Error_7);/*Label name already in label table*/
                         error_found = 1;
                     }
@@ -143,7 +144,7 @@ int first_pass(char* file_name) {
     if(!error_found){
         return second_pass(file_name,&IC,&DC);
     }
-    printf("Errors were found during the first pass in the file, assembler  process can't be completed");
+    printf("Errors were found during the first pass in the file, assembler  process can't be completed\n");
     return 0;
 }
 
@@ -217,7 +218,7 @@ int process_data_directive(char* line, int* DC) {
     /* Skip .data directive */
     pos = strstr(line, ".data");
     if (pos == NULL) {
-        report_error(line_number, Error_10);/*Missing .data directive*/
+        report_error(line_number, Error_10); /*Missing .data directive*/
         return 0;
     }
     
@@ -226,13 +227,13 @@ int process_data_directive(char* line, int* DC) {
     
     /* Check for empty data directive */
     if (*pos == '\0') {
-        report_error(line_number, Error_11);/*Missing value in .data directive*/
+        report_error(line_number, Error_11); /*Missing value in .data directive*/
         return 0;
     }
     
     /* Check for leading comma */
     if (*pos == ',') {
-        report_error(line_number, Error_11);/*Missing value in .data directive*/
+        report_error(line_number, Error_11); /*Missing value in .data directive*/
         return 0;
     }
     
@@ -245,7 +246,7 @@ int process_data_directive(char* line, int* DC) {
         if (*pos == '\0') {
             /* If we found a trailing comma before */
             if (!has_found_value) {
-                report_error(line_number, Error_11);/*Missing value in .data directive*/
+                report_error(line_number, Error_11); /*Missing value in .data directive*/
                 return 0;
             }
             break;
@@ -253,7 +254,7 @@ int process_data_directive(char* line, int* DC) {
         
         /* Check for consecutive commas */
         if (*pos == ',') {
-            report_error(line_number, Error_11);/*Missing value in .data directive*/
+            report_error(line_number, Error_11); /*Missing value in .data directive*/
             return 0;
         }
         
@@ -267,7 +268,7 @@ int process_data_directive(char* line, int* DC) {
         
         /* Verify it's a digit */
         if (!isdigit((unsigned char)*pos)) {
-            report_error(line_number, Error_12);/*Invalid value in .data directive*/
+            report_error(line_number, Error_12); /*Invalid value in .data directive*/
             return 0;
         }
         
@@ -290,7 +291,7 @@ int process_data_directive(char* line, int* DC) {
         
         /* Check for 12-bit range (-2048 to 2047) */
         if (temp_value < -2048 || temp_value > 2047) {
-            report_error(line_number, Error_13);/*Number out of range*/
+            report_error(line_number, Error_13); /*Number out of range*/
             return 0;
         }
         
@@ -328,7 +329,7 @@ int process_string_directive(char* line, int* DC) {
     /* Skip .string directive */
     pos = strstr(line, ".string");
     if (pos == NULL) {
-        report_error(line_number, Error_13);/*Number out of range*/
+        report_error(line_number, Error_13); /*Number out of range*/
         return 0;
     }
     pos += 7;  
@@ -336,13 +337,13 @@ int process_string_directive(char* line, int* DC) {
     
     /* Check for empty string directive */
     if (*pos == '\0') {
-        report_error(line_number, Error_25);/*Empty string in .string*/
+        report_error(line_number, Error_25); /*Empty string in .string*/
         return 0;
     }
     
     /* Check for opening quote*/
     if (*pos != '\"') {
-        report_error(line_number, Error_14);/*Syntax error in .string directive*/
+        report_error(line_number, Error_14); /*Syntax error in .string directive*/
         return 0;
     }
     
@@ -582,7 +583,7 @@ int process_operation(char* line, int* IC) {
             }
 
             if (!is_valid_addressing_mode(opcode, target_addr_mode, 0)) {
-                report_error(line_number, Error_27);/*Invalid addressing mode*/
+                report_error(line_number, Error_27); /*Invalid addressing mode*/
                 return 0;
             }
 
@@ -595,12 +596,19 @@ int process_operation(char* line, int* IC) {
     
     /* Encode first word (instruction word) */
     instruction_word = (opcode->opcode_number << 18);             /* Opcode: bits 23-18 */
-    instruction_word |= (source_addr_mode << 16);  /* Source addressing mode: bits 17-16 */
-    instruction_word |= (source_register << 13);   /* Source register: bits 15-13 */
-    instruction_word |= (target_addr_mode << 11);  /* Target addressing mode: bits 12-11 */
-    instruction_word |= (target_register << 8);    /* Target register: bits 10-8 */
+    if (operand_count == 1) {
+        instruction_word |= (target_addr_mode << 16);  /* Source addressing mode: bits 17-16 */
+        instruction_word |= (target_register << 13);   /* Source register: bits 15-13 */
+        instruction_word |= (source_addr_mode << 11);  /* Target addressing mode: bits 12-11 */
+        instruction_word |= (source_register << 8);    /* Target register: bits 10-8 */
+    } else {
+        instruction_word |= (source_addr_mode << 16);  /* Source addressing mode: bits 17-16 */
+        instruction_word |= (source_register << 13);   /* Source register: bits 15-13 */
+        instruction_word |= (target_addr_mode << 11);  /* Target addressing mode: bits 12-11 */
+        instruction_word |= (target_register << 8);    /* Target register: bits 10-8 */
+    }
     instruction_word |= (opcode->funct << 3);                 /* Function code: bits 7-3 (0 for now) */
-    instruction_word |= 1;                        /* ARE: bits 2-0 (001 = absolute) */
+    instruction_word |= 4;                        /* ARE: bits 2-0 (001 = absolute) */
     
     /* Store the instruction word */
     if (!create_binary_code(instruction_word, *IC)) {
@@ -613,14 +621,14 @@ int process_operation(char* line, int* IC) {
     
     /* Process source operand if not a register and add 1 to IC */
     if (operand_count > 0 && source_addr_mode != ADDR_MODE_REGISTER) {
-        if (!encode_operand(operand1, source_addr_mode, IC)) {
+        if (!encode_operand(operand1, source_addr_mode, IC, *IC - 1)) {
             return 0;
         }
     }
     
     /* Process target operand if present and not a register and add 1 to IC */
     if (operand_count > 1 && target_addr_mode != ADDR_MODE_REGISTER) {
-        if (!encode_operand(operand2, target_addr_mode, IC)) {
+        if (!encode_operand(operand2, target_addr_mode, IC, *IC - 2)) {
             return 0;
         }
     }
@@ -671,7 +679,7 @@ int determine_addressing_mode(char* operand, int* addr_mode, int* reg_num) {
 }
 
 /* Helper function to encode operand words */
-int encode_operand(char* operand, int addr_mode, int* IC) {
+int encode_operand(char* operand, int addr_mode, int* IC, int command_IC) {
     int operand_word = 0;
     long value;
     char* label;
@@ -679,7 +687,7 @@ int encode_operand(char* operand, int addr_mode, int* IC) {
     
     switch(addr_mode) {
         case ADDR_MODE_IMMEDIATE:
-            /* Immediate value: 21 bits for value, ARE = 001 (absolute) */
+            /* Immediate value: 21 bits for value, ARE = 100 (absolute) */
             value = strtol(operand + 1, NULL, 10); /* Skip the # */
 
             if (value < -1048576 || value > 1048575) {
@@ -687,23 +695,24 @@ int encode_operand(char* operand, int addr_mode, int* IC) {
                 return 0;
             }
             operand_word = ((int)value & 0x1FFFFF) << 3; /* 21-bit value */
-            operand_word |= 1; /* ARE = 001 (absolute) */
+            operand_word |= 4; /* ARE = 100 (absolute) */
             break;
             
         case ADDR_MODE_DIRECT:
-            /* Direct addressing: 21 bits for address, ARE = 010 (relocatable) or 100 (external) */
+            /* Direct addressing: 21 bits for address, ARE = 010 (relocatable) or 001 (external) */
             label = operand;
             label_entry = get_label(label);
             
             if (label_entry == NULL) {
                 /* Label not found - will be resolved in second pass */
+                /* In all of them keep the command IC for calculating relative to command*/
                 operand_word = UKNOWN_LABEL_DIRECT; 
-                if (!create_unknown_label(label, *IC, UKNOWN_LABEL_DIRECT, line_number)) {
+                if (!create_unknown_label(label, *IC, UKNOWN_LABEL_DIRECT, line_number, command_IC)) {
                     report_error(line_number, Error_28);/*Failed to create binary code*/
                     return 0;
                 }
             } else if (label_entry->type == EXTERN_TYPE) {
-                if (!create_unknown_label(label, *IC, UKNOWN_LABEL_DIRECT, line_number)) {
+                if (!create_unknown_label(label, *IC, UKNOWN_LABEL_DIRECT, line_number, command_IC)) {
                     report_error(line_number, Error_28);/*Failed to create binary code*/
                     return 0;
                 }
@@ -714,7 +723,7 @@ int encode_operand(char* operand, int addr_mode, int* IC) {
             break;
             
         case ADDR_MODE_RELATIVE:
-            /* Relative addressing: 21 bits for offset, ARE = 001 (absolute) */
+            /* Relative addressing: 21 bits for offset, ARE = 100 (absolute) */
             label = operand + 1; /* Skip the & */
             label_entry = get_label(label);
             
@@ -729,7 +738,7 @@ int encode_operand(char* operand, int addr_mode, int* IC) {
                 /* Calculate distance (will be done in second pass) */
                 operand_word = UKNOWN_LABEL_RELATIVE; 
             }
-            if (!create_unknown_label(label, *IC, UKNOWN_LABEL_RELATIVE, line_number)) {
+            if (!create_unknown_label(label, *IC, UKNOWN_LABEL_RELATIVE, line_number, command_IC)) {
                 report_error(line_number, Error_28);/*Failed to create binary code*/
                 return 0;
             }

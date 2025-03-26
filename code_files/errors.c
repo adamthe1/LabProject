@@ -10,7 +10,7 @@ Error error_list[] = {
     {Error_4, "Error 4: Error: Memory allocation failed\n"},
     {Error_5, "Error 5: Reading text failed\n"},
     {Error_6, "Error 6: There is no macro name\n"},
-    {Error_7, "Error 7: Label name already in label table"},
+    {Error_7, "Error 7: Label name already in label or macro table\n"},
     {Error_8, "Error 8: Label name is too long\n"},
     {Error_9, "Error 9: Invalid label name\n"},
     {Error_10, "Error 10: Missing .data directive\n"},
@@ -38,10 +38,10 @@ Error error_list[] = {
     {Error_32, "Error 32: Line after Label cannot be empty\n"},
     {Error_33, "Error 33: Unvalid macro name\n"},
     {Error_34, "Error 34: Label name doesn't exist in the label table\n"},
-    {Error_35, "Error 35: Line too long (over 81 char)"},
+    {Error_35, "Error 35: Line too long (over 81 char)\n"},
     {Error_36, "Error 36: External label in relative addressing mode\n"},
     {Error_37, "Error 37: No binary code with that IC\n"},
-    {Error_38, "Error 38: unclosed macro definition"}
+    {Error_38, "Error 38: unclosed macro definition\n"}
 };
 
 void report_error(int line_num, int error_num){
