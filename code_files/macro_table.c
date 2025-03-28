@@ -4,13 +4,15 @@
 #include "../headers/macro_table.h"
 #include "../headers/helper.h"
 
-static Macro* head = NULL;
+static Macro *head = NULL;
 
-int create_macro(char* name, int line_index){
+int create_macro(char *name, int line_index)
+{
 
-    Macro* new_macro = (Macro*)malloc(sizeof(Macro));
+    Macro *new_macro = (Macro *)malloc(sizeof(Macro));
 
-    if(new_macro == NULL){
+    if (new_macro == NULL)
+    {
         return 0;
     }
 
@@ -19,11 +21,15 @@ int create_macro(char* name, int line_index){
     new_macro->code = NULL;
     new_macro->next = NULL;
 
-    if(head == NULL){
+    if (head == NULL)
+    {
         head = new_macro;
-    }else{
-        Macro* current = head;
-        while(current->next != NULL){
+    }
+    else
+    {
+        Macro *current = head;
+        while (current->next != NULL)
+        {
             current = current->next;
         }
         current->next = new_macro;
@@ -33,20 +39,24 @@ int create_macro(char* name, int line_index){
 
 /**
  * @brief This function adds code lines to the last macro in the list.
- * 
+ *
  * @param code - the code line to add.
  * @return int - 1 if the code was added successfully, 0 otherwise.
  */
-int add_code_to_macro(char* code){
-    Macro* current = head;
-    if(head == NULL){
+int add_code_to_macro(char *code)
+{
+    Macro *current = head;
+    if (head == NULL)
+    {
         return 0;
     }
-    while(current->next != NULL){
+    while (current->next != NULL)
+    {
         current = current->next;
     }
-    current->code = (char*)malloc(strlen(code) + 1);
-    if (!current->code) {
+    current->code = (char *)malloc(strlen(code) + 1);
+    if (!current->code)
+    {
         printf("Memory allocation failed for macro code\n");
         return 0;
     }
@@ -56,13 +66,15 @@ int add_code_to_macro(char* code){
 
 /**
  * @brief This function returns the code of the macro with the given name.
- * 
+ *
  * @param name - the name of the macro.
  * @return char* - the code of the macro.
  */
-char* get_macro_code(char* name){
-    Macro* current = get_macro(name);
-    if(current != NULL){
+char *get_macro_code(char *name)
+{
+    Macro *current = get_macro(name);
+    if (current != NULL)
+    {
         return current->code;
     }
     return NULL;
@@ -70,14 +82,17 @@ char* get_macro_code(char* name){
 
 /**
  * @brief This function returns the macro with the given name.
- * 
+ *
  * @param name - the name of the macro.
  * @return Macro* - the macro.
  */
-Macro* get_macro(char* name){
-    Macro* current = head;
-    while(current != NULL){
-        if(strcmp(current->name, name) == 0){
+Macro *get_macro(char *name)
+{
+    Macro *current = head;
+    while (current != NULL)
+    {
+        if (strcmp(current->name, name) == 0)
+        {
             return current;
         }
         current = current->next;
@@ -87,13 +102,15 @@ Macro* get_macro(char* name){
 
 /**
  * @brief This function frees the memory allocated for the head list.
- * 
+ *
  */
 
-void free_macros(){
-    Macro* current = head;
-    Macro* next;
-    while(current != NULL){
+void free_macros()
+{
+    Macro *current = head;
+    Macro *next;
+    while (current != NULL)
+    {
         next = current->next;
         free(current->name);
         free(current->code);
@@ -102,22 +119,31 @@ void free_macros(){
     }
 }
 
+void reset_macros()
+{
+    free_macros();
+    head = NULL;
+}
+
 /**
  * @brief This function prints all macros in the list.
- * 
+ *
  */
-void print_macros() {
-    Macro* current = head;
-    
-    if (head == NULL) {
+void print_macros()
+{
+    Macro *current = head;
+
+    if (head == NULL)
+    {
         printf("No macros defined.\n");
         return;
     }
-    
+
     printf("Macro Table:\n");
     printf("------------\n");
-    
-    while (current != NULL) {
+
+    while (current != NULL)
+    {
         printf("Name: %s\n", current->name);
         printf("Line: %d\n", current->line_index);
         printf("Code: %s\n", current->code ? current->code : "No code defined");

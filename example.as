@@ -26,11 +26,11 @@ mcro bigMacroNew
     prn r7
 mcroend
 
-.extern j routineOne
+.extern routineOne
 
-macroBeta:      mov r2, r3
+start:      mov r2, r3
             prn textOne
-            lea addrOne, r4
+macroAlpha:            lea addrOne, r4
 
 
 .entry loopStart

@@ -6,17 +6,19 @@
 #include "../headers/errors.h"
 #include "../headers/helper.h"
 
-static Label* head = NULL;
-static Data_binary* data_head = NULL;
-static Code_binary* code_head = NULL;
+static Label *head = NULL;
+static Data_binary *data_head = NULL;
+static Code_binary *code_head = NULL;
 static Unknown_label *unknown_head = NULL;
 
-int create_label(char* name, char type, int line_index){
+int create_label(char *name, char type, int line_index)
+{
 
-    Label* new_label = (Label*)malloc(sizeof(Label));
+    Label *new_label = (Label *)malloc(sizeof(Label));
 
-    if(new_label == NULL){
-        
+    if (new_label == NULL)
+    {
+
         return 0;
     }
 
@@ -26,11 +28,15 @@ int create_label(char* name, char type, int line_index){
     new_label->is_entry = 0;
     new_label->next = NULL;
 
-    if(head == NULL){
+    if (head == NULL)
+    {
         head = new_label;
-    }else{
-        Label* current = head;
-        while(current->next != NULL){
+    }
+    else
+    {
+        Label *current = head;
+        while (current->next != NULL)
+        {
             current = current->next;
         }
         current->next = new_label;
@@ -38,17 +44,19 @@ int create_label(char* name, char type, int line_index){
     return 1;
 }
 
-
 /**
  * @brief This function returns the label with the given name.
- * 
+ *
  * @param name - the name of the label.
  * @return label* - the label.
  */
-Label* get_label(char* name){
-    Label* current = head;
-    while(current != NULL){
-        if(strcmp(current->name, name) == 0){
+Label *get_label(char *name)
+{
+    Label *current = head;
+    while (current != NULL)
+    {
+        if (strcmp(current->name, name) == 0)
+        {
             return current;
         }
         current = current->next;
@@ -56,32 +64,37 @@ Label* get_label(char* name){
     return NULL;
 }
 
-Label* get_label_head(){
-    if(head){
+Label *get_label_head()
+{
+    if (head)
+    {
         return head;
     }
     return NULL;
 }
 
-int add_entry(char* label_name){
-    Label* temp = get_label(label_name);
-    if(!temp){
+int add_entry(char *label_name)
+{
+    Label *temp = get_label(label_name);
+    if (!temp)
+    {
         return 0; /*error - not a labael name*/
     }
     temp->is_entry = 1;
     return 1;
 }
 
-
 /**
  * @brief This function frees the memory allocated for the head list.
- * 
+ *
  */
 
-void free_labels(){
-    Label* current = head;
-    Label* next;
-    while(current != NULL){
+void free_labels()
+{
+    Label *current = head;
+    Label *next;
+    while (current != NULL)
+    {
         next = current->next;
         free(current->name);
         free(current);
@@ -89,10 +102,12 @@ void free_labels(){
     }
 }
 
-int create_binary_data(int binary, int DC_index){
-    Data_binary* new_data = (Data_binary*)malloc(sizeof(Data_binary));
+int create_binary_data(int binary, int DC_index)
+{
+    Data_binary *new_data = (Data_binary *)malloc(sizeof(Data_binary));
 
-    if(new_data == NULL){
+    if (new_data == NULL)
+    {
         return 0;
     }
 
@@ -100,11 +115,15 @@ int create_binary_data(int binary, int DC_index){
     new_data->DC_index = DC_index;
     new_data->next = NULL;
 
-    if(data_head == NULL){
+    if (data_head == NULL)
+    {
         data_head = new_data;
-    }else{
-        Data_binary* current = data_head;
-        while(current->next != NULL){
+    }
+    else
+    {
+        Data_binary *current = data_head;
+        while (current->next != NULL)
+        {
             current = current->next;
         }
         current->next = new_data;
@@ -112,19 +131,20 @@ int create_binary_data(int binary, int DC_index){
     return 1;
 }
 
-
-
 /**
  * @brief This function returns the data with the given line index.
- * 
+ *
  * @param line_index - the index of the line in the file.
  * @return Data_binary* - the data.
  */
 
-Data_binary* get_binary_data(int DC_index){
-    Data_binary* current = data_head;
-    while(current != NULL){
-        if(current->DC_index == DC_index){
+Data_binary *get_binary_data(int DC_index)
+{
+    Data_binary *current = data_head;
+    while (current != NULL)
+    {
+        if (current->DC_index == DC_index)
+        {
             return current;
         }
         current = current->next;
@@ -132,15 +152,19 @@ Data_binary* get_binary_data(int DC_index){
     return NULL;
 }
 
-int add_IC_to_DC(int IC_index){
-    Data_binary* current = data_head;
+int add_IC_to_DC(int IC_index)
+{
+    Data_binary *current = data_head;
     Label *label = head;
-    while(current != NULL){
+    while (current != NULL)
+    {
         current->DC_index += IC_index;
         current = current->next;
     }
-    while(label != NULL){
-        if (label->type == DATA_TYPE){
+    while (label != NULL)
+    {
+        if (label->type == DATA_TYPE)
+        {
             label->line_index += IC_index;
         }
         label = label->next;
@@ -150,23 +174,27 @@ int add_IC_to_DC(int IC_index){
 
 /**
  * @brief This function frees the memory allocated for the data list.
- * 
+ *
  */
 
-void free_binary_data(){
-    Data_binary* current = data_head;
-    Data_binary* next;
-    while(current != NULL){
+void free_binary_data()
+{
+    Data_binary *current = data_head;
+    Data_binary *next;
+    while (current != NULL)
+    {
         next = current->next;
         free(current);
         current = next;
     }
 }
 
-int create_binary_code(int binary, int IC_index){
-    Code_binary* new_code = (Code_binary*)malloc(sizeof(Code_binary));
+int create_binary_code(int binary, int IC_index)
+{
+    Code_binary *new_code = (Code_binary *)malloc(sizeof(Code_binary));
 
-    if(new_code == NULL){
+    if (new_code == NULL)
+    {
         return 0;
     }
 
@@ -174,11 +202,15 @@ int create_binary_code(int binary, int IC_index){
     new_code->IC_index = IC_index;
     new_code->next = NULL;
 
-    if(code_head == NULL){
+    if (code_head == NULL)
+    {
         code_head = new_code;
-    }else{
-        Code_binary* current = code_head;
-        while(current->next != NULL){
+    }
+    else
+    {
+        Code_binary *current = code_head;
+        while (current->next != NULL)
+        {
             current = current->next;
         }
         current->next = new_code;
@@ -186,31 +218,38 @@ int create_binary_code(int binary, int IC_index){
     return 1;
 }
 
-Code_binary* get_binary_code(int IC_index){
-    Code_binary* current = code_head;
-    while(current != NULL){
-        if(current->IC_index == IC_index){
-            return (Code_binary*)current;
+Code_binary *get_binary_code(int IC_index)
+{
+    Code_binary *current = code_head;
+    while (current != NULL)
+    {
+        if (current->IC_index == IC_index)
+        {
+            return (Code_binary *)current;
         }
         current = current->next;
     }
     return NULL;
 }
 
-void free_binary_code(){
-    Code_binary* current = code_head;
-    Code_binary* next;
-    while(current != NULL){
+void free_binary_code()
+{
+    Code_binary *current = code_head;
+    Code_binary *next;
+    while (current != NULL)
+    {
         next = current->next;
         free(current);
         current = next;
     }
 }
 
-int create_unknown_label(char* name, int IC_index, int type, int line_number, int command_IC){
-    Unknown_label* new_label = (Unknown_label*)malloc(sizeof(Unknown_label));
+int create_unknown_label(char *name, int IC_index, int type, int line_number, int command_IC)
+{
+    Unknown_label *new_label = (Unknown_label *)malloc(sizeof(Unknown_label));
 
-    if(new_label == NULL) {
+    if (new_label == NULL)
+    {
         return 0;
     }
 
@@ -221,11 +260,15 @@ int create_unknown_label(char* name, int IC_index, int type, int line_number, in
     new_label->next = NULL;
     new_label->command_IC = command_IC;
 
-    if(unknown_head == NULL) {
+    if (unknown_head == NULL)
+    {
         unknown_head = new_label;
-    } else {
-        Unknown_label* current = unknown_head;
-        while(current->next != NULL) {
+    }
+    else
+    {
+        Unknown_label *current = unknown_head;
+        while (current->next != NULL)
+        {
             current = current->next;
         }
         current->next = new_label;
@@ -233,10 +276,13 @@ int create_unknown_label(char* name, int IC_index, int type, int line_number, in
     return 1;
 }
 
-Unknown_label* get_unknown_label(char* name) {
-    Unknown_label* current = unknown_head;
-    while(current != NULL) {
-        if(strcmp(current->name, name) == 0) {
+Unknown_label *get_unknown_label(char *name)
+{
+    Unknown_label *current = unknown_head;
+    while (current != NULL)
+    {
+        if (strcmp(current->name, name) == 0)
+        {
             return current;
         }
         current = current->next;
@@ -244,10 +290,12 @@ Unknown_label* get_unknown_label(char* name) {
     return NULL;
 }
 
-void free_unknown_labels() {
-    Unknown_label* current = unknown_head;
-    Unknown_label* next;
-    while(current != NULL) {
+void free_unknown_labels()
+{
+    Unknown_label *current = unknown_head;
+    Unknown_label *next;
+    while (current != NULL)
+    {
         next = current->next;
         free(current->name);
         free(current);
@@ -255,52 +303,73 @@ void free_unknown_labels() {
     }
 }
 
-Unknown_label* get_unknown_head(){
-    if(unknown_head){
+Unknown_label *get_unknown_head()
+{
+    if (unknown_head)
+    {
         return unknown_head;
     }
     return NULL;
 }
 
+void reset_all_tables()
+{
+    free_labels();
+    free_binary_data();
+    free_binary_code();
+    free_unknown_labels();
+    head = NULL;
+    data_head = NULL;
+    code_head = NULL;
+    unknown_head = NULL;
+}
 
-
-void print_label_table(){
-    Label* current = head;
-    while(current != NULL){
+void print_label_table()
+{
+    Label *current = head;
+    while (current != NULL)
+    {
         printf("Label: %s, Type: %d, Line: %d\n", current->name, current->type, current->line_index);
         current = current->next;
     }
 }
 
-void print_data_table(){
-    Data_binary* current = data_head;
-    while(current != NULL){
+void print_data_table()
+{
+    Data_binary *current = data_head;
+    while (current != NULL)
+    {
         printf("Data: %c  %d, DC: %d\n", current->binary, current->binary, current->DC_index);
         current = current->next;
     }
 }
 
-void print_code_table(){
-    Code_binary* current = code_head;
-    while(current != NULL){
+void print_code_table()
+{
+    Code_binary *current = code_head;
+    while (current != NULL)
+    {
         int i;
         /* print in binary parsed */
         printf("Binary code: ");
-        for (i = 23; i >= 0; i--) {
+        for (i = 23; i >= 0; i--)
+        {
             printf("%d", (current->binary >> i) & 1);
             if (i == 18 || i == 16 || i == 13 || i == 11 || i == 8 || i == 3)
-            printf(", ");
+                printf(", ");
         }
         printf("  ");
-        
+
         printf("Code: %d, IC: %d\n", current->binary, current->IC_index);
         current = current->next;
     }
 }
 
-void print_unknown_table(){
-    Unknown_label* current = unknown_head;
-    while(current != NULL){
+void print_unknown_table()
+{
+    Unknown_label *current = unknown_head;
+    while (current != NULL)
+    {
         printf("Unknown label: %s, Type: %d, IC: %d, Line: %d\n", current->name, current->type, current->IC_index, current->line_number);
         current = current->next;
     }

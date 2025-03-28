@@ -12,21 +12,21 @@
 
 /**
  * @brief The main function of the assembler program.
- * 
+ *
  * @param argc - the number of arguments.
  * @param argv - the arguments.
- * 
+ *
  */
 int main(int argc, char *argv[])
 {
     int i = 1;
     char *file_name;
     char *am_file_name;
-    FILE* file;
+    FILE *file;
     /* check if the number of arguments is correct */
     if (argc < TWO)
     {
-        report_error(0, Error_0);/*Not enough arguments in command*/
+        report_error(0, Error_0); /*Not enough arguments in command*/
         return 1;
     }
     /* preprocess the files */
@@ -36,35 +36,38 @@ int main(int argc, char *argv[])
         file_name = get_file_name(argv[i]);
         if (file_name == NULL)
             continue;
-        
 
         file = look_for_file(file_name);
         if (file == NULL)
             continue;
         fclose(file);
-        
-        printf("Starting preprocessing - %s\n",file_name);
-        if (preprocess(file_name) == 0){
-            free_macros();
+
+        printf("Starting preprocessing - %s\n", file_name);
+        if (preprocess(file_name) == 0)
+        {
+            printf("Error found in preprocessing, stopping here\n");
+            reset_macros();
             continue;
         }
 
         printf("Preprocessing finished\n");
-        
+
         am_file_name = change_suffix(file_name, ".am");
-        
+
         printf("Starting first pass on %s\n", am_file_name);
-        if (first_pass(am_file_name) == 0){
-            free_all();
+        if (first_pass(am_file_name) == 0)
+        {
+            reset_all();
             continue;
         }
 
         printf("First pass finished\n");
-        free_all();
-        free(am_file_name);
-        free(file_name); 
-        
+        reset_all();
     }
-    
+
+    free_all();
+    free(file_name);
+    free(am_file_name);
+
     return 0;
 }
