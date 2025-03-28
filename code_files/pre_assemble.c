@@ -97,7 +97,6 @@ int preprocess(char *file_name)
         }
 
         pos = skip_whitespace(line);
-
         /* Skip empty lines */
         if (pos[0] == '\0' || pos[0] == '\n')
         {
@@ -127,7 +126,6 @@ int preprocess(char *file_name)
             fprintf(fp2, "%s", code); /*prints the macro code instead of its name*/
             continue;
         }
-
         pos = skip_whitespace(line);
 
         /*step3*/
@@ -171,20 +169,26 @@ int preprocess(char *file_name)
             temp_code_used = 0;
             continue;
         }
+        
+        if (mcro_flag){
 
-        if (mcro_flag)
-        {
-            if (strncmp(pos, "mcroend", 7) == 0)
-            { /*A start of macro declaration*/
-
-                pos += 7;
-                pos = skip_whitespace(pos);
-
-                if (*pos != '\n' && *pos != '\0')
-                {
-                    report_error(linecount, Error_3); /* Invalid macroend declaration*/
-                    error_found = 1;
+            if ((pos = strstr(line,"mcroend"))){/*A start of macro declaration*/
+                if((pos>line && !isspace(*(pos-1))) || (*(pos+7) != '\0' && !isspace(*(pos+7)))){
+                    ;/*not a macroend declaration - part of the macro*/
                 }
+                else{
+                    if(strcmp(first_thing,"mcroend")){
+                        report_error(linecount, Error_3);/* Invalid macroend declaration*/
+                        error_found = 1;
+                    }
+        
+                    pos += 7;
+                    pos = skip_whitespace(pos);
+                    
+                    if (*pos != '\n' && *pos != '\0'){
+                        report_error(linecount,Error_3); /* Invalid macroend declaration*/
+                        error_found = 1;
+                    }
 
                 add_code_to_macro(temp_code); /*adds the whole macro code to the macro*/
                 temp_code[0] = '\0';          /*initilazes the temp_code*/

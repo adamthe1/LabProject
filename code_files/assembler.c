@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
         file = look_for_file(file_name);
         if (file == NULL)
             continue;
+            
         fclose(file);
 
         printf("Starting preprocessing - %s\n", file_name);
