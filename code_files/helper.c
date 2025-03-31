@@ -71,10 +71,24 @@ int get_reg(char *name)
     {
         if (!strcmp(name, reg[i]))
         {
-            return i;
+            return 1;
         }
     }
-    return -1;
+    return 0;
+}
+
+int get_instruction(char *name)
+{
+    int i;
+    for (i = 0; i < 4; i++)
+    {
+        if (!strcmp(name, insturctions[i]))
+        {
+            printf("found instruction %s\n", name);
+            return 1;
+        }
+    }
+    return 0;
 }
 
 char *get_file_name(char *file_name)
@@ -133,32 +147,10 @@ char *change_suffix(char *file_name, char *suffix)
  */
 int cmp_mcro_name(char *name)
 {
-    int i;
-    for (i = 0; i < 8; i++)
+    if (get_opcode(name) || get_reg(name) || get_instruction(name))
     {
-        if (!strcmp(name, reg[i]))
-        {
-            /*error*/
-            return 0;
-        }
-    }
-
-    for (i = 0; i < 16; i++)
-    {
-        if (!strcmp(name, op_codes[i].name))
-        {
-            /*error*/
-            return 0;
-        }
-    }
-
-    for (i = 0; i < 4; i++)
-    {
-        if (!strcmp(name, insturctions[i]))
-        {
-            /*error*/
-            return 0;
-        }
+        /*error*/
+        return 0;
     }
 
     if  (!strcmp(name, "mcro"))
@@ -166,6 +158,7 @@ int cmp_mcro_name(char *name)
         /*error*/
         return 0;
     }
+
     if  (!strcmp(name, "mcroend"))
     {
         /*error*/

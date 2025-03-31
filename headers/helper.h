@@ -43,6 +43,15 @@ Op_code *get_opcode(char *name);
 int get_reg(char *reg_name);
 
 /**
+ * @brief Gets the instruction name in intstructions.
+ * 
+ * @param name - the name of the instruction.
+ * @return int - the index of the instruction if found, -1 otherwise.
+ */
+
+int get_instruction(char *name);
+
+/**
  * @brief Extracts the filename from a given file path.
  *
  * @param file_name - the name of the file without suffix

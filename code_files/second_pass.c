@@ -160,7 +160,7 @@ int second_pass(char *file_name, int *IC, int *DC, int error_found_first)
 
     if (error_found)
     { /*if there is at least 1 error in the file found in the second pass*/
-        printf("Errors were found during the second pass in the file, assembler  process can't be completed\n");
+        printf("Errors were found during the pass in the file, assembler  process can't be completed\n");
         /* delete all files*/
         remove(ob_name);
         remove(ext_name);

@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
     char *file_name;
     char *am_file_name;
     FILE *file;
+    int preprocess_result;
     /* check if the number of arguments is correct */
     if (argc < TWO)
     {
@@ -45,7 +46,8 @@ int main(int argc, char *argv[])
         fclose(file);
 
         printf("Starting preprocessing - %s\n", file_name);
-        if (preprocess(file_name) == 0)
+        preprocess_result = preprocess(file_name);
+        if (preprocess_result == 0)
         {
             printf("Error found in preprocessing, stopping here\n");
             reset_macros();
@@ -55,7 +57,7 @@ int main(int argc, char *argv[])
         printf("Preprocessing finished\n");
 
         printf("Starting first pass on %s\n", am_file_name);
-        if (first_pass(am_file_name) == 0)
+        if (first_pass(am_file_name, preprocess_result) == 0)
         {
             reset_all();
             continue;

@@ -16,7 +16,7 @@ static char line[MAX_LINE_LENGTH + 1]; /* +1 for possible \n */
 static int line_number = 0;
 static int error_found = 0;
 
-int first_pass(char *file_name)
+int first_pass(char *file_name, int preprocess_result)
 {
     int DC = 0;
     int IC = 100;
@@ -29,6 +29,10 @@ int first_pass(char *file_name)
     file = fopen(file_name, "r");
     line_number = 0;
     error_found = 0;
+    if (preprocess_result == 2)
+    {
+        error_found = 1;
+    }
 
     /* Reset file pointer to beginning */
     rewind(file);
@@ -69,8 +73,13 @@ int first_pass(char *file_name)
             if (symbol_flag)
             {
                 /* Add label to symbol table as data */
+                if (get_opcode(label_name) || get_reg(label_name) || get_instruction(label_name))
+                {
+                    report_error(line_number, Error_44); /*Label name already in opcode, reg, or instruction*/
+                    error_found = 1;
+                }
 
-                if (get_label(label_name) || get_opcode(label_name))
+                if (get_label(label_name))
                 {
                     report_error(line_number, Error_7); /*Label name already in label table*/
                     error_found = 1;
@@ -92,12 +101,18 @@ int first_pass(char *file_name)
             if (symbol_flag)
             {
                 /* Add label to symbol table as data */
-                /* Must be unique - check if that name is already in label */
-                if (get_label(label_name) || get_opcode(label_name))
+                if (get_opcode(label_name) || get_reg(label_name) || get_instruction(label_name))
+                {
+                    report_error(line_number, Error_44); /*Label name already in opcode, reg, or instruction*/
+                    error_found = 1;
+                }
+
+                if (get_label(label_name))
                 {
                     report_error(line_number, Error_7); /*Label name already in label table*/
                     error_found = 1;
                 }
+
                 if (!create_label(label_name, DATA_TYPE, DC))
                 {
                     report_error(line_number, Error_22); /*Failed to create string label*/
@@ -125,7 +140,13 @@ int first_pass(char *file_name)
             if (symbol_flag)
             {
                 /* Add label to symbol table as code */
-                if (get_label(label_name) || get_opcode(label_name))
+                if (get_opcode(label_name) || get_reg(label_name) || get_instruction(label_name))
+                {
+                    report_error(line_number, Error_44); /*Label name already in opcode, reg, or instruction*/
+                    error_found = 1;
+                }
+
+                if (get_label(label_name))
                 {
                     report_error(line_number, Error_7); /*Label name already in label table*/
                     error_found = 1;
@@ -160,13 +181,13 @@ int first_pass(char *file_name)
 
     if (DC > (1 << 21))
     {
-        report_error(line_number, Error_41);
+        report_error(line_number, Error_41); /*Data out of range of computer address*/
         error_found = 1;
     }
 
     fclose(file);
 
-    
+    printf("First pass completed. Starting second pass...\n");
     return second_pass(file_name, &IC, &DC, error_found);
     
 }

@@ -8,9 +8,10 @@
  * @brief Performs the first pass on the assembly file
  *
  * @param file - The assembly source file
+ * @param preprocess_result - Result of the preprocessing step (1 if successful, 2 if there is a line that is too long)
  * @return int - 1 if successful, 0 if errors were found
  */
-int first_pass(char *file_name);
+int first_pass(char *file_name, int preprocess_result);
 
 /**
  * @brief Parses a line and determines if it has a label

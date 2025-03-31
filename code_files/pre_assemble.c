@@ -41,7 +41,7 @@ int preprocess(char *file_name)
     char *temp_code, *code;
     char first_thing[MAX_MCRO_LENGTH];
     char mcro_name[MAX_MCRO_LENGTH];
-    char line[MAX_LINE_LENGTH + 2];
+    char line[MAX_LINE_LENGTH + 3];
     char *am_file_name;
     char *pos;
     int i = 0;
@@ -51,6 +51,9 @@ int preprocess(char *file_name)
     size_t temp_code_used = 0; /* Currently used bytes in temp_code */
     size_t new_size = 0;
     char *new_buffer;
+    int too_long_flag = 0; /* Flag to indicate if the line is too long */
+    int has_line_too_long = 0; /* Flag to indicate if thefile has a line that is too long */
+
 
     /* mcro_flag is a flag to flag that current line is a macro code */
     int mcro_flag = 0;
@@ -87,6 +90,14 @@ int preprocess(char *file_name)
     /*the loop ends when the file ends*/
     while (fgets(line, sizeof(line), fp))
     {
+        if (too_long_flag)
+        {
+            if (strchr(line, '\n') != NULL)
+            {
+                too_long_flag = 0;
+            }
+            continue;
+        }
         linecount++;
         /* Remove newline character if present */
 
@@ -96,7 +107,10 @@ int preprocess(char *file_name)
             report_error(linecount, Error_35);
             line[80] = '\n'; 
             line[81] = '\0'; /* Add null terminator */
+            too_long_flag = 1;
+            has_line_too_long = 1; /* Set the flag to indicate a line is too long */
         }
+        
 
         pos = skip_whitespace(line);
         /* Skip empty lines */
@@ -255,6 +269,10 @@ int preprocess(char *file_name)
     {
         fclose(fp2);
         free(am_file_name);
+        if (has_line_too_long)
+        {
+            return 2;
+        }
         return 1;
     }
 }
