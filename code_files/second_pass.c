@@ -152,8 +152,6 @@ int second_pass(char *file_name, int *IC, int *DC, int error_found_first)
     {
         error_found = 1;
     }
-    if (1)
-        ;
 
     /*step 7*/
     fclose(file);

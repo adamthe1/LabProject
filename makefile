@@ -2,7 +2,7 @@
 
 # Compiler settings
 CC = gcc
-CFLAGS = -Wall -ansi -pedantic -g
+CFLAGS = -Wall -ansi -pedantic -g -Wextra
 
 # Source and header directories
 SRC_DIR = code_files

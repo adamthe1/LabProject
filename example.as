@@ -4,7 +4,7 @@ mcro macroAlpha
     bne routineOne
     mcroend
 
-mcro macroBeta                                                                                mcro Beta
+mcro macroBeta                      
     sub r5, r6
     jsr routineTwo
     dec r4

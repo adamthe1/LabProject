@@ -8,7 +8,7 @@
 int is_valid_label_name(char *label)
 {
     int i;
-    size_t len;
+    int len;
     len = strlen(label);
 
     /* Must start with a letter */
@@ -32,7 +32,7 @@ int is_valid_label_name(char *label)
 int is_valid_operand(char *operand)
 {
     int i;
-    size_t len;
+    int len;
     len = strlen(operand);
     if (len == 0)
     {
