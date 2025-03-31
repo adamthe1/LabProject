@@ -33,7 +33,7 @@ static char line[MAX_LINE_LENGTH + 1]; /* +1 for possible \n */
 static int line_number = 0;
 static int error_found = 0;
 
-int second_pass(char *file_name, int *IC, int *DC)
+int second_pass(char *file_name, int *IC, int *DC, int error_found_first)
 {
     char label_name[MAX_LABEL_LEN];
     int inst_type, i;
@@ -62,7 +62,7 @@ int second_pass(char *file_name, int *IC, int *DC)
 
     file = fopen(file_name, "r");
     line_number = 0;
-    error_found = 0;
+    error_found = error_found_first;
 
     /* Reset file pointer to beginning */
 
@@ -127,12 +127,20 @@ int second_pass(char *file_name, int *IC, int *DC)
                 continue;
             }
 
-            if (!get_label(label_name))
+            current = get_label(label_name);
+            if (current == NULL)
             {
                 report_error(line_number, Error_34); /*Label name doesn't exist in the label table*/
                 error_found = 1;
                 continue;
             }
+            if (current->type == EXTERN_TYPE)
+            {
+                report_error(line_number, Error_43); /*Label name doesn't exist in the label table*/
+                error_found = 1;
+                continue;
+            }
+            current = NULL;
 
             add_entry(label_name);
 
@@ -192,10 +200,6 @@ int second_pass(char *file_name, int *IC, int *DC)
     free(ent_name);
     free(ext_name);
     free(ob_name);
-    print_code_table();
-    print_data_table();
-    print_label_table();
-    print_unknown_table();
     return 1;
 }
 
@@ -241,11 +245,6 @@ int process_unknown(char *external_file)
                     current = current->next;
                     continue;
                 }
-                if (strcmp(label->name, "val") == 0)
-                {
-                    print_label_table();
-                    printf("val: %d\n", label->line_index);
-                }
                 code->binary = (label->line_index & 0x1FFFFF) << 3; /* 21-bit address */
                 code->binary |= 2;                                  /* ARE = 010 (relocatable) */
             }
@@ -271,6 +270,13 @@ int process_unknown(char *external_file)
             if (label->type == EXTERN_TYPE)
             {
                 report_error(current->line_number, Error_36); /*external label in relative addressing mode*/
+                error_found = 1;
+                current = current->next;
+                continue;
+            }
+            if (label->type == DATA_TYPE)
+            {
+                report_error(current->line_number, Error_42); /*external label in relative addressing mode*/
                 error_found = 1;
                 current = current->next;
                 continue;

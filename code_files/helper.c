@@ -161,6 +161,17 @@ int cmp_mcro_name(char *name)
         }
     }
 
+    if  (!strcmp(name, "mcro"))
+    {
+        /*error*/
+        return 0;
+    }
+    if  (!strcmp(name, "mcroend"))
+    {
+        /*error*/
+        return 0;
+    }
+
     return 1;
 }
 /**

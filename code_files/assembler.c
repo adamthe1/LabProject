@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
     {
         /* get the file name with a suffix if the arg is empty continue*/
         file_name = get_file_name(argv[i]);
+        am_file_name = change_suffix(file_name, ".am");
         if (file_name == NULL)
             continue;
 
@@ -52,8 +53,6 @@ int main(int argc, char *argv[])
         }
 
         printf("Preprocessing finished\n");
-
-        am_file_name = change_suffix(file_name, ".am");
 
         printf("Starting first pass on %s\n", am_file_name);
         if (first_pass(am_file_name) == 0)

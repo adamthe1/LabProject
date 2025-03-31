@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "label_data_struct.h"
 
-int second_pass(char *file_name, int *IC, int *DC);
+int second_pass(char *file_name, int *IC, int *DC, int error_found_first);
 
 /**
  * @brief This function processes the unknown labels in the unknown label table

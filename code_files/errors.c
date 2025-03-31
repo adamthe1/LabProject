@@ -44,7 +44,9 @@ Error error_list[] = {
     {Error_38, "Error 38: unclosed macro definition\n"},
     {Error_39, "Error 39: Must have space after label\n"},
     {Error_40, "Error 40: Label cannot be name of macro\n"},
-    {Error_41, "Error 41: The IC or DC is too big, there is only 2^21 adresses\n"}  
+    {Error_41, "Error 41: The IC or DC is too big, there is only 2^21 adresses\n"}  ,
+    {Error_42, "Error 42: Relative addressing can only be done with command labels\n"},
+    {Error_43, "Error 43: Entry label cannot be extern label\n"},
 };
 
 void report_error(int line_num, int error_num)

@@ -158,7 +158,7 @@ int first_pass(char *file_name)
     }
     DC = DC + IC;
 
-    if (DC > 2 ^ 21)
+    if (DC > (1 << 21))
     {
         report_error(line_number, Error_41);
         error_found = 1;
@@ -166,12 +166,9 @@ int first_pass(char *file_name)
 
     fclose(file);
 
-    if (!error_found)
-    {
-        return second_pass(file_name, &IC, &DC);
-    }
-    printf("Errors were found during the first pass in the file, assembler  process can't be completed\n");
-    return 0;
+    
+    return second_pass(file_name, &IC, &DC, error_found);
+    
 }
 
 int parse_label(char *line, char *label_name)
