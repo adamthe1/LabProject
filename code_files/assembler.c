@@ -24,16 +24,16 @@ int main(int argc, char *argv[])
     char *am_file_name;
     FILE *file;
     int preprocess_result;
-    /* check if the number of arguments is correct */
+    /* Check if the number of arguments is correct */
     if (argc < TWO)
     {
         report_error(0, Error_0); /*Not enough arguments in command*/
         return 1;
     }
-    /* preprocess the files */
+    /* Process the files */
     for (; i < argc; i++)
     {
-        /* get the file name with a suffix if the arg is empty continue*/
+        /* Get the file name with a suffix if the arg is empty continue*/
         file_name = get_file_name(argv[i]);
         am_file_name = change_suffix(file_name, ".am");
         if (file_name == NULL)
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        printf("First pass finished\n");
+        printf("Second pass finished\n");
         reset_all();
     }
 

@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/**
+ * @brief Array of errors that contains the error number and the report error to print
+*/
 Error error_list[] = {
     {Error_0, "Error 0: Not enough arguments in command\n"},
     {Error_1, "Error 1: Can't open file\n"},

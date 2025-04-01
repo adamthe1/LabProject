@@ -7,6 +7,14 @@
 #define _MCRO_TABLE_H
 
 /* Macros are nodes in a linked list*/
+/**
+ * @brief struct of macro and its information
+ * 
+ * @param name The macro name
+ * @param code The macro code
+ * @param line_index The line index of the macro
+ * @param next The next macro in the list
+ */
 typedef struct Macro
 {
     char *name;
@@ -16,18 +24,18 @@ typedef struct Macro
 } Macro;
 
 /**
- * @brief This function creates a new macro node and adds it to the list.
+ * @brief Creates a new macro node and adds it to the list.
  *
- * @param name - the name of the macro.
- * @param line_index - the index of the line in the file.
+ * @param name - The name of the macro.
+ * @param line_index - The index of the line in the file.
  * @return int - 1 if the macro was created successfully, 0 otherwise.
  */
 int create_macro(char *name, int line_index);
 
 /**
- * @brief This function adds code lines to the last macro in the list.
+ * @brief Adds code lines to the last macro in the list.
  *
- * @param code - the code line to add.
+ * @param code - The code line to add.
  * @return int - 1 if the code was added successfully, 0 otherwise.
  */
 int add_code_to_macro(char *code);
@@ -35,33 +43,35 @@ int add_code_to_macro(char *code);
 /**
  * @brief This function returns the code of the macro with the given name.
  *
- * @param name - the name of the macro.
- * @return char* - the code of the macro.
+ * @param name - The name of the macro.
+ * @return char* - The code of the macro.
  */
 char *get_macro_code(char *name);
 
 /**
  * @brief This function returns the macro with the given name.
  *
- * @param name - the name of the macro.
- * @return Macro* - the macro.
+ * @param name - The name of the macro.
+ * @return Macro* - The macro.
  */
 Macro *get_macro(char *name);
 
 /**
- * @brief This function frees the memory allocated for the macros list.
+ * @brief Frees the memory allocated for the macros list.
  *
  */
-
 void free_macros();
 
 /**
- * @brief This function resets the macro table.
+ * @brief Resets the macro table.
  * 
  */
-
 void reset_macros();
 
+/**
+ * @brief Prints all macros in the list.
+ *
+ */
 void print_macros();
 
 #endif

@@ -67,7 +67,7 @@ int second_pass(char *file_name, int *IC, int *DC, int error_found_first)
     /* Reset file pointer to beginning */
 
     rewind(file);
-    /*step 1*/
+    /*Step 1*/
     while (fgets(line, sizeof(line), file))
     {
         line_number++;
@@ -84,8 +84,8 @@ int second_pass(char *file_name, int *IC, int *DC, int error_found_first)
             continue;
         }
 
-        /*step 2*/
-        /*If(the first field in the line is a symbol (label)) - skip it*/
+        /*Step 2 - If(the first field in the line is a symbol (label)) - skip it*/
+        
         colon_pos = strchr(pos, ':');
         if (colon_pos != NULL)
         {
@@ -94,19 +94,20 @@ int second_pass(char *file_name, int *IC, int *DC, int error_found_first)
         }
         pos = skip_whitespace(pos);
 
-        /*step 3*/
+        /*Step 3*/
 
         inst_type = identify_instruction(pos);
         if (inst_type == INST_TYPE_DATA || inst_type == INST_TYPE_STRING || inst_type == INST_TYPE_EXTERN)
             continue;
 
-        /*step 4*/
+        /*Step 4*/
 
         if (inst_type == INST_TYPE_ENTRY)
         {
             /* make label_name new again*/
             memset(label_name, 0, MAX_LABEL_LEN);
-            /*steps 5*/
+
+            /*Steps 5*/
             if (strncmp(pos, ".entry", 6) == 0)
             {
                 pos += 6;
@@ -142,7 +143,7 @@ int second_pass(char *file_name, int *IC, int *DC, int error_found_first)
             }
             current = NULL;
 
-            add_entry(label_name);
+            add_entry(label_name);/*Marks the label as entry*/
 
             continue;
         }
@@ -153,7 +154,7 @@ int second_pass(char *file_name, int *IC, int *DC, int error_found_first)
         error_found = 1;
     }
 
-    /*step 7*/
+    /*Step 7*/
     fclose(file);
 
     if (error_found)
@@ -170,9 +171,10 @@ int second_pass(char *file_name, int *IC, int *DC, int error_found_first)
         fclose(fp_ent);
         return 0;
     }
-    /*step 8 - bulid the output files*/
+    /*Step 8 - Bulid the output files*/
 
-    fprintf(fp_ob, "%d %d\n", *IC - 100, *DC - *IC); /*print the file headline*/
+    /*Prints the ob file*/
+    fprintf(fp_ob, "%d %d\n", *IC - 100, *DC - *IC); /*Prints the file headline*/
 
     for (i = 100; i < *IC; i++)
     {
@@ -183,6 +185,7 @@ int second_pass(char *file_name, int *IC, int *DC, int error_found_first)
         fprintf(fp_ob, "%07d %06x\n", i, get_binary_data(i)->binary & 0xFFFFFF);
     }
 
+    /*Prints the ent file*/
     current = get_label_head();
     while (current != NULL)
     {

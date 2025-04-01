@@ -5,7 +5,7 @@
 #include "label_data_struct.h"
 
 /**
- * @brief Performs the first pass on the assembly file
+ * @brief Performs the first pass on the assembly file and calls the second pass
  *
  * @param file - The assembly source file
  * @param preprocess_result - Result of the preprocessing step (1 if successful, 2 if there is a line that is too long)
@@ -65,7 +65,7 @@ int process_entry_directive(char *line);
 int process_extern_directive(char *line);
 
 /**
- * @brief Processes an assembly operation (MOV, CMP, ADD, etc.)
+ * @brief Processes an assembly operation (mov, cmp, add, etc.)
  *
  * @param line - The operation line
  * @param IC - Current instruction counter (updated by function)
@@ -91,7 +91,6 @@ int encode_operand(char *operand, int addr_mode, int *IC, int command_IC);
  * @param reg_num - Buffer to store the register number
  * @return int - 1 if successful, 0 if error
  */
-
 int determine_addressing_mode(char *operand, int *addr_mode, int *reg_num);
 
 #endif /* _FIRST_PASS_H */

@@ -1,0 +1,102 @@
+mcro macroAlpha
+    add r2, r3
+mcroend
+
+
+.extern ,routineOne
+
+startTooLongNameForLabelInAssembly:      Mov r2, *r3
+            prN textOne
+            leA addrOne, r4
+
+wrong: .entry loopStart
+
+            sub  ,  r4, dataTwo
+            jsr routineOne ,
+
+            prn     .   r3
+            clr r7  .
+            mov r0,, *r5
+            sub textTwo,        , addrTwo
+            ,add r2, *r4
+            stop 7
+
+textOne7.:    .string "Starting the testing sequence." , "another string"
+dataTwo_wrong:    .data7 2, , -2, 4000, -4000
+
+1routineOneCall: lea textTwo, *r7
+
+textTwo    .string "Further testing with a new string." "another string2"
+mVar&:       .dataa 30, 40, -50, 60, 70
+
+    *loopStart:  prn #55
+            lea textThree, *r6, 7
+
+.extern% routineThree
+
+routineAlpha:: clr r3
+              lea textOne, r4
+              add r5, r4
+              jsr routineFive
+              prn *r2
+    add r2, r3
+
+.entryj routineAlpha
+
+routineFive : clr r0
+            
+addrFour :   .data 200.55.6, 300, 400
+
+.externj externalAddr3
+
+.entry7 routineBeta
+
+addrOne:    .data 1024, -+2048, /4096, -?8192   :
+            prn textThree
+
+addrOne:  .stringl "Data string within the sequence."
+
+macroAlpha: jsr routineAlpha
+            
+              stop 8
+
+mov:    .data 700, 800, 900,
+
+
+cmp:    .data, 7500, -7600,         7700, -7800, 7900
+
+add:   .string7 "A different string within the code."
+
+sub:   .data 900, -1000, 1100, -1200, 1300, -1400
+
+lea:  .data 1500, 1600, 1700
+
+clr:   .string! "Ending sequence with this string."
+
+not:    .string "Starting the testing sequence."
+inc:    .data 2, -2, 4000, -4000
+
+dec: lea textTwo, *r7
+
+jmp:    .string "Further testing with a new string."
+
+bne:       .data 30, 40, -50, 60, 70
+
+jsr:  prn #55
+
+red: clr r3
+
+prn: clr r0
+        
+rts:   .data 200, 300, 400
+
+stop: clr r6
+
+:    .data 700, 800, 900
+
+
+label: .extern externalAddr5
+
+addrTwo:    
+
+addrFive:   .data 900, -1000, 1100, -1200.5, 1300, -+1400

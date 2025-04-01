@@ -24,6 +24,12 @@ typedef enum ERROR_NUMBERS {
     Error_49, Error_50
 } ERROR_NUMBERS;
 
+/**
+ * @brief struct of error
+ * 
+ * @param error_num The error number
+ * @param error_message The error message to print
+ */
 typedef struct Error{
     int error_num;
     char* error_message;
@@ -31,6 +37,12 @@ typedef struct Error{
 
 extern Error error_list[];
 
+/**
+ * @brief Report the error - prints to stdout
+ * Prints the error and the line number.
+ * @param line_num The error line number
+ * @param line_num The error number
+ */
 void report_error(int line_num, int error_num);
 
 #endif /* ERRORS_H */

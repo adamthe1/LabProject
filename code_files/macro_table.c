@@ -8,19 +8,20 @@ static Macro *head = NULL;
 
 int create_macro(char *name, int line_index)
 {
-
     Macro *new_macro = (Macro *)malloc(sizeof(Macro));
 
     if (new_macro == NULL)
     {
+        /*Memory allocation failed*/
         return 0;
     }
-
+    /*Initilizes the new macro values*/
     new_macro->name = copy_string(name);
     new_macro->line_index = line_index;
     new_macro->code = NULL;
     new_macro->next = NULL;
 
+    /*Adds the new macro to the end of the list*/
     if (head == NULL)
     {
         head = new_macro;
@@ -37,21 +38,18 @@ int create_macro(char *name, int line_index)
     return 1;
 }
 
-/**
- * @brief This function adds code lines to the last macro in the list.
- *
- * @param code - the code line to add.
- * @return int - 1 if the code was added successfully, 0 otherwise.
- */
+
 int add_code_to_macro(char *code)
 {
     Macro *current = head;
     if (head == NULL)
     {
+        /*No macros in the list*/
         return 0;
     }
     while (current->next != NULL)
     {
+        /*Go to the end of the list*/
         current = current->next;
     }
     current->code = (char *)malloc(strlen(code) + 1);
@@ -64,12 +62,7 @@ int add_code_to_macro(char *code)
     return 1;
 }
 
-/**
- * @brief This function returns the code of the macro with the given name.
- *
- * @param name - the name of the macro.
- * @return char* - the code of the macro.
- */
+
 char *get_macro_code(char *name)
 {
     Macro *current = get_macro(name);
@@ -80,30 +73,23 @@ char *get_macro_code(char *name)
     return NULL;
 }
 
-/**
- * @brief This function returns the macro with the given name.
- *
- * @param name - the name of the macro.
- * @return Macro* - the macro.
- */
+
 Macro *get_macro(char *name)
 {
     Macro *current = head;
     while (current != NULL)
     {
+        /*Looks for the macro*/
         if (strcmp(current->name, name) == 0)
         {
             return current;
         }
         current = current->next;
     }
+    /*No macro with this name is in the table*/
     return NULL;
 }
 
-/**
- * @brief This function frees the memory allocated for the head list.
- *
- */
 
 void free_macros()
 {
@@ -125,10 +111,7 @@ void reset_macros()
     head = NULL;
 }
 
-/**
- * @brief This function prints all macros in the list.
- *
- */
+
 void print_macros()
 {
     Macro *current = head;

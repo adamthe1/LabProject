@@ -18,10 +18,10 @@ int create_label(char *name, char type, int line_index)
 
     if (new_label == NULL)
     {
-
         return 0;
     }
 
+    /*Creates the new label with initial values*/
     new_label->name = copy_string(name);
     new_label->line_index = line_index;
     new_label->type = type;
@@ -34,6 +34,7 @@ int create_label(char *name, char type, int line_index)
     }
     else
     {
+        /*Adds it to the end of the list*/
         Label *current = head;
         while (current->next != NULL)
         {
@@ -44,23 +45,21 @@ int create_label(char *name, char type, int line_index)
     return 1;
 }
 
-/**
- * @brief This function returns the label with the given name.
- *
- * @param name - the name of the label.
- * @return label* - the label.
- */
+
 Label *get_label(char *name)
 {
     Label *current = head;
     while (current != NULL)
     {
+        /*Looks for the label*/
         if (strcmp(current->name, name) == 0)
         {
+            /*Label has found*/
             return current;
         }
         current = current->next;
     }
+    /*Label has not found*/
     return NULL;
 }
 
@@ -84,11 +83,6 @@ int add_entry(char *label_name)
     return 1;
 }
 
-/**
- * @brief This function frees the memory allocated for the head list.
- *
- */
-
 void free_labels()
 {
     Label *current = head;
@@ -108,13 +102,16 @@ int create_binary_data(int binary, int DC_index)
 
     if (new_data == NULL)
     {
+        /*Memory allocation failed*/
         return 0;
     }
 
+    /*Initilizes the new values*/
     new_data->binary = binary;
     new_data->DC_index = DC_index;
     new_data->next = NULL;
 
+    /*Adds it to the end of the list*/
     if (data_head == NULL)
     {
         data_head = new_data;
@@ -131,18 +128,13 @@ int create_binary_data(int binary, int DC_index)
     return 1;
 }
 
-/**
- * @brief This function returns the data with the given line index.
- *
- * @param line_index - the index of the line in the file.
- * @return Data_binary* - the data.
- */
 
 Data_binary *get_binary_data(int DC_index)
 {
     Data_binary *current = data_head;
     while (current != NULL)
     {
+        /*Looks for data*/
         if (current->DC_index == DC_index)
         {
             return current;
@@ -172,10 +164,6 @@ int add_IC_to_DC(int IC_index)
     return 1;
 }
 
-/**
- * @brief This function frees the memory allocated for the data list.
- *
- */
 
 void free_binary_data()
 {
@@ -195,13 +183,15 @@ int create_binary_code(int binary, int IC_index)
 
     if (new_code == NULL)
     {
+        /*Memory allocation failed*/
         return 0;
     }
-
+    /*Initilizes the new code values*/
     new_code->binary = binary;
     new_code->IC_index = IC_index;
     new_code->next = NULL;
 
+    /*Adds it to the end of the list*/
     if (code_head == NULL)
     {
         code_head = new_code;
@@ -250,9 +240,11 @@ int create_unknown_label(char *name, int IC_index, int type, int line_number, in
 
     if (new_label == NULL)
     {
+        /*Memory allocation failed*/
         return 0;
     }
 
+    /*Initilizes the new label values*/
     new_label->name = copy_string(name);
     new_label->IC_index = IC_index;
     new_label->type = type;
@@ -260,6 +252,7 @@ int create_unknown_label(char *name, int IC_index, int type, int line_number, in
     new_label->next = NULL;
     new_label->command_IC = command_IC;
 
+    /*Adds it to the end of the list*/
     if (unknown_head == NULL)
     {
         unknown_head = new_label;

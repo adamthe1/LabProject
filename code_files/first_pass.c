@@ -29,6 +29,7 @@ int first_pass(char *file_name, int preprocess_result)
     file = fopen(file_name, "r");
     line_number = 0;
     error_found = 0;
+    /*If there is at least 1 too long line the file*/
     if (preprocess_result == 2)
     {
         error_found = 1;
@@ -91,6 +92,7 @@ int first_pass(char *file_name, int preprocess_result)
                     error_found = 1;
                 }
             }
+            /*Process the data directive*/
             if (!process_data_directive(line, &DC))
             {
                 error_found = 1;
@@ -119,6 +121,7 @@ int first_pass(char *file_name, int preprocess_result)
                     error_found = 1;
                 }
             }
+            /*Process the string directive*/
             if (!process_string_directive(line, &DC))
             {
                 error_found = 1;
@@ -130,6 +133,7 @@ int first_pass(char *file_name, int preprocess_result)
             break;
 
         case INST_TYPE_EXTERN:
+            /*Process the extern directive*/
             if (!process_extern_directive(line))
             {
                 error_found = 1;
@@ -160,7 +164,7 @@ int first_pass(char *file_name, int preprocess_result)
 
             if (!process_operation(line, &IC))
             {
-                error_found = 1;
+                error_found = 1;/*There is an error in the operation*/
             }
             break;
 
@@ -187,6 +191,7 @@ int first_pass(char *file_name, int preprocess_result)
 
     fclose(file);
 
+    /*moving to the second pass*/
     printf("First pass completed. Starting second pass...\n");
     return second_pass(file_name, &IC, &DC, error_found);
     
@@ -199,6 +204,7 @@ int parse_label(char *line, char *label_name)
 
     line = skip_whitespace(line);
 
+    /*Looks for label*/
     colon_pos = strchr(line, ':');
     if (colon_pos == NULL)
     {
@@ -218,7 +224,7 @@ int parse_label(char *line, char *label_name)
         report_error(line_number, Error_8); /*Label name is too long*/
         error_found = 1;
     }
-
+    /*Copies the label name into label_name*/
     strncpy(label_name, line, label_len);
     label_name[label_len] = '\0';
 
@@ -245,7 +251,7 @@ int identify_instruction(char *line)
 
     line = skip_whitespace(line);
 
-    /* Check for directives */
+    /* check for directives */
     if (*line == '.')
     {
         if (strncmp(line, ".data ", 5) == 0)
@@ -290,14 +296,14 @@ int process_data_directive(char *line, int *DC)
     pos += 5; /* Skip ".data" */
     pos = skip_whitespace(pos);
 
-    /* Check for empty data directive */
+    /* check for empty data directive */
     if (*pos == '\0')
     {
         report_error(line_number, Error_11); /*Missing value in .data directive*/
         return 0;
     }
 
-    /* Check for leading comma */
+    /* check for leading comma */
     if (*pos == ',')
     {
         report_error(line_number, Error_11); /*Missing value in .data directive*/
@@ -322,7 +328,7 @@ int process_data_directive(char *line, int *DC)
             break;
         }
 
-        /* Check for consecutive commas */
+        /* check for consecutive commas */
         if (*pos == ',')
         {
             report_error(line_number, Error_11); /*Missing value in .data directive*/
@@ -559,7 +565,7 @@ int process_extern_directive(char *line)
         /* Label already exists as external, no need to create it again */
         return 1;
     }
-
+    /*Create the label as an extern*/
     flag = create_label(label_name, EXTERN_TYPE, 0);
     if (!flag)
     {
@@ -619,6 +625,7 @@ int process_operation(char *line, int *IC)
     if (*line != '\0')
     {
         i = 0;
+        /*Finds the operand*/
         while (*line && *line != ',' && i < MAX_OPERAND_LEN)
         {
             operand1[i++] = *line++;
@@ -672,7 +679,7 @@ int process_operation(char *line, int *IC)
             report_error(line_number, Error_31); /*Invalid operand*/
             return 0;
         }
-
+        /*Validate the addressing mode*/
         if (!is_valid_addressing_mode(opcode, source_addr_mode, operand_count == 2))
         {
             report_error(line_number, Error_27); /*Invalid addressing mode*/
@@ -784,7 +791,7 @@ int determine_addressing_mode(char *operand, int *addr_mode, int *reg_num)
         return 1;
     }
 
-    /* Check for register addressing by checking if its an r followed by a number */
+    /* Check for register addressing by checking if its an r followed by a 0-7*/
     if (operand[0] == 'r')
     {
         if (isdigit((unsigned char)operand[1]) && (operand[2] == '\0'))
@@ -881,7 +888,7 @@ int encode_operand(char *operand, int addr_mode, int *IC, int command_IC)
         }
         else if (label_entry->type == EXTERN_TYPE)
         {
-            report_error(line_number, Error_36); /*external label in relative addressing mode*/
+            report_error(line_number, Error_36); /*External label in relative addressing mode*/
             return 0;
         }
         else

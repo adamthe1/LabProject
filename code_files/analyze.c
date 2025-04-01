@@ -38,7 +38,7 @@ int is_valid_operand(char *operand)
     {
         return 0;
     }
-    /* if starts with '#' must be a number can start with +, - */
+    /* If starts with '#', must be a number - can start with +, - */
     if (operand[0] == '#')
     {
         if (len == 1)
@@ -104,7 +104,7 @@ int is_valid_operand(char *operand)
     return 1;
 }
 
-/* Check if an addressing mode is valid for the given opcode */
+/* Checks if an addressing mode is valid for the given opcode */
 int is_valid_addressing_mode(Op_code *opcode, int addr_mode, int is_source)
 {
     int mode_bit = 1 << addr_mode;

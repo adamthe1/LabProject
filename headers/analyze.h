@@ -19,7 +19,7 @@ int is_valid_label_name(char *label);
 int is_valid_operand(char *operand);
 
 /**
- * Check if address mode is valid according to assembly rules.
+ * Checks if address mode is valid according to assembly rules.
  *
  * @param opcode The opcode to check
  * @param addr_mode The address mode to validate

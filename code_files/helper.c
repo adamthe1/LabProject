@@ -7,6 +7,7 @@
 #include "../headers/label_data_struct.h"
 #include "../headers/macro_table.h"
 
+/*Array of registers names*/
 char *reg[8] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
 
 /* The format is {name_opcode, opcode_number, funct_number, operand_count, addressing_modes_src, addressing_modes_dest} */
@@ -50,7 +51,7 @@ Op_code op_codes[16] = {
 };
 
 char *insturctions[4] = {"data", "string", "entry", "extern"};
-
+/*Gets a pointer to the opcode struct*/
 Op_code *get_opcode(char *name)
 {
     int i;
@@ -63,7 +64,7 @@ Op_code *get_opcode(char *name)
     }
     return NULL;
 }
-
+/*Returns 1 if the register name is valid*/
 int get_reg(char *name)
 {
     int i;
@@ -76,7 +77,7 @@ int get_reg(char *name)
     }
     return 0;
 }
-
+/*Returns 1 if the instruction name is valid*/
 int get_instruction(char *name)
 {
     int i;
@@ -84,7 +85,6 @@ int get_instruction(char *name)
     {
         if (!strcmp(name, insturctions[i]))
         {
-            printf("found instruction %s\n", name);
             return 1;
         }
     }
@@ -139,48 +139,36 @@ char *change_suffix(char *file_name, char *suffix)
     return new_file_name;
 }
 
-/**
- * @brief This function chaecks if the macro name is a name of a known word of assembly (operation/instruction/register).
- *
- * @param name - the name of the macro.
- * @return int - returns 1 if the macro name is valid and 0 if it isn't.
- */
 int cmp_mcro_name(char *name)
 {
     if (get_opcode(name) || get_reg(name) || get_instruction(name))
     {
-        /*error*/
+        /*A known name in Assembly*/
         return 0;
     }
 
     if  (!strcmp(name, "mcro"))
     {
-        /*error*/
+        /*Macro name can't be "mcro"*/
         return 0;
     }
 
     if  (!strcmp(name, "mcroend"))
     {
-        /*error*/
+        /*Macro name can't be "mcroend"*/
         return 0;
     }
 
     return 1;
 }
-/**
- * @brief This function checks if the mcro name starts with a letter and contains alphanumeric characters or _
-    and that it is no longer than 31 chars.
- *
- * @param name - the name of the macro.
- * @return int - returns 1 if the macro name is valid and 0 if it isn't.
- */
+
 int mcro_letters(char *name)
 {
-    /*assums that name is not null*/
+    /*Assums that name is not null*/
     int i = 0;
     if (!isalpha(name[i]))
     {
-        /*error*/
+        /*Macro name has to start with a letter*/
         return 0;
     }
     i++;
@@ -188,13 +176,13 @@ int mcro_letters(char *name)
     {
         if (i == MAX_MCRO_LENGTH)
         {
-            /*error*/
+            /*Macro length is up to 31 chars*/
             return 0;
         }
 
         if (name[i] != '_' && !isalnum(name[i]))
         {
-            /*error*/
+            /*Macro name includes only letters, digits or '_'*/
             return 0;
         }
         i++;
@@ -202,14 +190,6 @@ int mcro_letters(char *name)
     return 1;
 }
 
-/**
- * @brief This function converts a number to binary with 2s complement.
- * @brief The number of bits is given in DEFINE.h.
- *
- * @param num - the decimal number to convert.
- * @param binary - the array to store the binary number.
- * @return int - returns 1 if the conversion was successful and 0 if it wasn't.
- */
 
 int dec_to_binary(int num, int *binary)
 {
@@ -277,51 +257,6 @@ char *copy_string(char *s)
     return new_s;
 }
 
-/**
- * @brief This function removes extra white chars from s.
- *
- * @param s - the string to remove extra white chars from.
- * @return void.
- */
-void extra_spaces(char *s)
-{
-    char *temp_s = (char *)malloc(strlen(s) + 1);
-    int i = 0, j = 0, space = 0, letter = 0;
-    if (temp_s == NULL)
-    {
-        return;
-    }
-    while (s[i] != '\0' && s[i] != '\n')
-    {
-        if (s[i] == ' ' || s[i] == 't')
-        {
-            if (s[i] != ' ')
-            {
-                s[i] = ' ';
-            }
-            if (space == 0 && letter == 1)
-            {
-                space = 1;
-                /*temp_s[j] = s[i];*/
-            }
-            i++;
-        }
-        else
-        {
-            if (space == 1 && letter == 1)
-            {
-                temp_s[j++] = ' ';
-                space = 0;
-            }
-            temp_s[j] = s[i];
-            i++;
-            j++;
-            letter = 1;
-        }
-    }
-    temp_s[j] = '\0';
-    strcpy(s, temp_s);
-}
 
 char *skip_whitespace(char *str)
 {

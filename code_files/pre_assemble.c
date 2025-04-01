@@ -24,20 +24,13 @@ otherwise, return to 6.
 9. finish: save the am file.
 */
 
-/**
- * @brief This function is the pre_assembler.
- *
- * @param file_name - the name of the file to check.
- * @return int - returns 1 if the pre_assembler has finished successfuly and 0 if it hasn't.
- */
 
 static int error_found = 0;
 
 int preprocess(char *file_name)
 {
-
+    /*fp is the as file pointer, fp2 is the am file pointer*/
     FILE *fp = NULL, *fp2 = NULL;
-    /*fp=as file pointer, fp2=am file pointer*/
     char *temp_code, *code;
     char first_thing[MAX_MCRO_LENGTH];
     char mcro_name[MAX_MCRO_LENGTH];
@@ -53,10 +46,8 @@ int preprocess(char *file_name)
     char *new_buffer;
     int too_long_flag = 0; /* Flag to indicate if the line is too long */
     int has_line_too_long = 0; /* Flag to indicate if thefile has a line that is too long */
+    int mcro_flag = 0;/* Flag to flag that current line is a macro code */
 
-
-    /* mcro_flag is a flag to flag that current line is a macro code */
-    int mcro_flag = 0;
 
     error_found = 0;
 
@@ -87,8 +78,7 @@ int preprocess(char *file_name)
     }
     temp_code[0] = '\0';
 
-    /*the loop ends when the file ends*/
-    while (fgets(line, sizeof(line), fp))
+    while (fgets(line, sizeof(line), fp)) /*The loop ends when the file ends*/
     {
         if (too_long_flag)
         {
@@ -129,11 +119,11 @@ int preprocess(char *file_name)
         }
 
         i = 0;
+        /*Save the first non white chars in first_thing*/
         while (pos[0] != '\0' && !isspace((unsigned char)pos[0]) && i < MAX_MCRO_LENGTH - 1 && pos[0] != '\n' && pos[0] != ':')
         {
             first_thing[i++] = *pos++;
         }
-
         first_thing[i] = '\0';
 
         
@@ -155,12 +145,13 @@ int preprocess(char *file_name)
         if (strncmp(pos, "mcro ", 5) == 0)
         { /*A start of macro declaration*/
 
-            pos += 5;
+            pos += 5;/*Skips the "mcro "*/
             pos = skip_whitespace(pos);
 
             i = 0;
             while (pos[0] != '\0' && !isspace((unsigned char)pos[0]) && i < MAX_MCRO_LENGTH - 1 && pos[0] != '\n')
             {
+                /*Save the macro name in mcro_name*/
                 mcro_name[i++] = *pos++;
             }
             mcro_name[i] = '\0';
@@ -200,7 +191,7 @@ int preprocess(char *file_name)
             { /*A start of macro declaration*/
                 if ((pos > line && !isspace(*(pos - 1))) || (*(pos + 7) != '\0' && !isspace(*(pos + 7))))
                 {
-                    ; /*not a macroend declaration - part of the macro*/
+                    ; /*Not a macroend declaration*/
                 }
                 else
                 {
@@ -210,7 +201,7 @@ int preprocess(char *file_name)
                         error_found = 1;
                     }
 
-                    pos += 7;
+                    pos += 7;/*Skips "mcroend"*/
                     pos = skip_whitespace(pos);
 
                     if (*pos != '\n' && *pos != '\0')
@@ -220,9 +211,9 @@ int preprocess(char *file_name)
                     }
                 }
 
-                add_code_to_macro(temp_code); /*adds the whole macro code to the macro*/
-                temp_code[0] = '\0';          /*initilazes the temp_code*/
-                mcro_flag = 0;                /*macro declaration has ended*/
+                add_code_to_macro(temp_code); /*Adds the whole macro code to the macro*/
+                temp_code[0] = '\0';          /*Initilazes the temp_code*/
+                mcro_flag = 0;                /*Macro declaration has ended*/
                 continue;
             }
             line_len = strlen(line);
@@ -243,11 +234,11 @@ int preprocess(char *file_name)
                 temp_code_size = new_size;
             }
 
-            strcat(temp_code, line); /*adds the current line to the temp_code*/
+            strcat(temp_code, line); /*Adds the current line to the temp_code*/
             temp_code_used += strlen(line);
             continue;
         }
-        fprintf(fp2, "%s", line); /*prints regular lines only in the am file*/
+        fprintf(fp2, "%s", line); /*Prints regular lines only in the am file*/
     }
     if (mcro_flag)
     {
@@ -258,7 +249,7 @@ int preprocess(char *file_name)
     free(temp_code);
     fclose(fp);
 
-    /* if there is an error delete fp2 and return 0*/
+    /* If there is an error delete fp2 and return 0*/
     if (error_found)
     {
         remove(am_file_name);
@@ -277,22 +268,17 @@ int preprocess(char *file_name)
     }
 }
 
-/**
- * @brief This function chaecks the validation of the macro name.
- *
- * @param mcro_name - the name of the macro.
- * @return int - returns 1 if the macro name is valid and 0 if it isn't.
- */
+
 int valid_macro_dec(char *mcro_name)
 {
-    /*checks that the mcro name is not a name of operation/instruction/register*/
+    /*Checks that the mcro name is not a name of operation/instruction/register*/
     if (!cmp_mcro_name(mcro_name))
     {
         /*error - invalid mcro name*/
         return 0;
     }
 
-    /*checks if the mcro name starts with a letter or _ and contains alphanumeric characters or _
+    /*Checks if the mcro name starts with a letter or _ and contains alphanumeric characters or _
     and that its legnth is not greater than 31*/
     if (!mcro_letters(mcro_name))
     {
@@ -302,7 +288,7 @@ int valid_macro_dec(char *mcro_name)
 
     if (get_macro(mcro_name))
     {
-        /* already defined*/
+        /* Already in the macro table*/
         return 0;
     }
     return 1;
