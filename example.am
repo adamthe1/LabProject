@@ -57,7 +57,7 @@ loopStart:  prn #55
     sub r5, r6
     jsr routineTwo
     dec r4
-wrong mcro macroGamma
+mcro macroGamma
     mov r3, r4
     prn r5
     clr r2
@@ -102,7 +102,7 @@ routineBeta: clr r6
     sub r5, r6
     jsr routineTwo
     dec r4
-wrong mcro macroGamma
+mcro macroGamma
     mov r3, r4
     prn r5
     clr r2

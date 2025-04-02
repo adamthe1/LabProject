@@ -80,6 +80,7 @@ int preprocess(char *file_name)
 
     while (fgets(line, sizeof(line), fp)) /*The loop ends when the file ends*/
     {
+        
         if (too_long_flag)
         {
             if (strchr(line, '\n') != NULL)
@@ -141,48 +142,6 @@ int preprocess(char *file_name)
         }
 
         pos = skip_whitespace(line);
-
-        if (strncmp(pos, "mcro ", 5) == 0)
-        { /*A start of macro declaration*/
-
-            pos += 5;/*Skips the "mcro "*/
-            pos = skip_whitespace(pos);
-
-            i = 0;
-            while (pos[0] != '\0' && !isspace((unsigned char)pos[0]) && i < MAX_MCRO_LENGTH - 1 && pos[0] != '\n')
-            {
-                /*Save the macro name in mcro_name*/
-                mcro_name[i++] = *pos++;
-            }
-            mcro_name[i] = '\0';
-
-            pos = skip_whitespace(pos);
-            if (*pos != '\n' && *pos != '\0')
-            {
-                report_error(linecount, Error_2); /*Extra chars in macro declaration line*/
-                error_found = 1;
-            }
-
-            if (strlen(mcro_name) == 0)
-            {
-                report_error(linecount, Error_6); /*There is no macro name*/
-                error_found = 1;
-            }
-
-            if (!valid_macro_dec(mcro_name))
-            {
-                report_error(linecount, Error_33); /*Unvalid macro name*/
-                error_found = 1;
-                continue;
-            }
-
-            mcro_flag = 1;                      /*macro declaration*/
-            create_macro(mcro_name, linecount); /*create a macro with the name temp*/
-            temp_code[0] = '\0';
-            temp_code_used = 0;
-            continue;
-        }
-
         if (mcro_flag)
         {
 
@@ -233,6 +192,48 @@ int preprocess(char *file_name)
             temp_code_used += strlen(line);
             continue;
         }
+
+        if (strncmp(pos, "mcro ", 5) == 0)
+        { /*A start of macro declaration*/
+
+            pos += 5;/*Skips the "mcro "*/
+            pos = skip_whitespace(pos);
+
+            i = 0;
+            while (pos[0] != '\0' && !isspace((unsigned char)pos[0]) && i < MAX_MCRO_LENGTH - 1 && pos[0] != '\n')
+            {
+                /*Save the macro name in mcro_name*/
+                mcro_name[i++] = *pos++;
+            }
+            mcro_name[i] = '\0';
+
+            pos = skip_whitespace(pos);
+            if (*pos != '\n' && *pos != '\0')
+            {
+                report_error(linecount, Error_2); /*Extra chars in macro declaration line*/
+                error_found = 1;
+            }
+
+            if (strlen(mcro_name) == 0)
+            {
+                report_error(linecount, Error_6); /*There is no macro name*/
+                error_found = 1;
+            }
+
+            if (!valid_macro_dec(mcro_name))
+            {
+                report_error(linecount, Error_33); /*Unvalid macro name*/
+                error_found = 1;
+                continue;
+            }
+
+            mcro_flag = 1;                      /*macro declaration*/
+            create_macro(mcro_name, linecount); /*create a macro with the name temp*/
+            temp_code[0] = '\0';
+            temp_code_used = 0;
+            continue;
+        }
+
         fprintf(fp2, "%s", line); /*Prints regular lines only in the am file*/
     }
     if (mcro_flag)

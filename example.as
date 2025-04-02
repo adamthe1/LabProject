@@ -10,7 +10,7 @@ mcro macroBeta
     dec r4
 
 
-wrong mcro macroGamma
+mcro macroGamma
     mov r3, r4
     prn r5
     clr r2
