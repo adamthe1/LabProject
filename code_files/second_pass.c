@@ -174,7 +174,7 @@ int second_pass(char *file_name, int *IC, int *DC, int error_found_first)
     /*Step 8 - Bulid the output files*/
 
     /*Prints the ob file*/
-    fprintf(fp_ob, "%d %d\n", *IC - 100, *DC - *IC); /*Prints the file headline*/
+    fprintf(fp_ob, "     %d %d\n", *IC - 100, *DC - *IC); /*Prints the file headline*/
 
     for (i = 100; i < *IC; i++)
     {
