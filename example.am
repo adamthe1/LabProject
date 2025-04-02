@@ -1,7 +1,6 @@
 
 
 
-
 .extern routineOne
 
 start:      mov r2, r3
@@ -58,6 +57,10 @@ loopStart:  prn #55
     sub r5, r6
     jsr routineTwo
     dec r4
+wrong mcro macroGamma
+    mov r3, r4
+    prn r5
+    clr r2
             inc r2
             cmp r3, #-25
             bne routineOne
@@ -99,6 +102,10 @@ routineBeta: clr r6
     sub r5, r6
     jsr routineTwo
     dec r4
+wrong mcro macroGamma
+    mov r3, r4
+    prn r5
+    clr r2
 
 .extern externalAddr4
 
@@ -124,9 +131,7 @@ routineGamma: jsr routineAlpha
               sub r2, r3
               cmp r7, #-40
               bne routineBeta
-    mov r3, r4
-    prn r5
-    clr r2
+macroGamma
               stop
 
 addrSix:    .data 700, 800, 900
@@ -154,9 +159,7 @@ addrSix:    .data 700, 800, 900
              prn r7
 
 addrTwo:    .data 1000
-    mov r3, r4
-    prn r5
-    clr r2
+macroGamma
 
 .extern externalAddr6
 

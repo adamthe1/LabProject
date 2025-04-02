@@ -2,15 +2,15 @@ mcro macroAlpha
     add r2, r3
     cmp r1, #20
     bne routineOne
-    mcroend
+mcroend
 
 mcro macroBeta                      
     sub r5, r6
     jsr routineTwo
     dec r4
-mcroend
 
-mcro macroGamma
+
+wrong mcro macroGamma
     mov r3, r4
     prn r5
     clr r2
